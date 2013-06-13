@@ -1,0 +1,3 @@
+Description
+
+EPANET is software that models water distribution piping systems. EPANET is public domain software that may be freely copied and distributed. It is a Windows 95/98/NT/XP program. EPANET performs extended period simulation of the water movement and quality behavior within pressurized pipe networks.                   
