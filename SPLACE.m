@@ -36,7 +36,7 @@ function varargout = SPLACE(varargin)
 
 % Edit the above text to modify the response to help SPLACE
 
-% Last Modified by GUIDE v2.5 24-May-2013 18:20:37
+% Last Modified by GUIDE v2.5 13-Jun-2013 13:52:02
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -100,11 +100,14 @@ function opening(hObject, eventdata, handles)
     set(handles.ComputeImpactMatrix,'enable','off');
     set(handles.SolveSensorPlacement,'enable','off');
     set(handles.SplaceTable,'visible','on');
+    
+    set(handles.SaveNetwork,'visible','off');
     set(handles.Zoom,'visible','off');
     set(handles.NodesID,'visible','off');
     set(handles.LinksID,'visible','off');
     set(handles.FontsizeENplotText,'visible','off');
     set(handles.FontsizeENplot,'visible','off');
+    
     set(handles.SplaceTable,'String','');
     set(handles.SplaceTable,'enable','inactive');
 
@@ -229,6 +232,7 @@ function LoadInputFile_Callback(hObject, eventdata, handles)
         set(handles.SolveSensorPlacement,'enable','on');
         
         % graphs
+        set(handles.SaveNetwork,'visible','on');
         set(handles.Zoom,'visible','on');
         set(handles.NodesID,'visible','on');
         set(handles.LinksID,'visible','on');
@@ -1051,3 +1055,31 @@ function frameOfNet_Callback(hObject, eventdata, handles)
 % hObject    handle to frameOfNet (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+
+
+% --- Executes on button press in SaveNetwork.
+function SaveNetwork_Callback(hObject, eventdata, handles)
+% hObject    handle to SaveNetwork (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+    % graphs
+    set(handles.SaveNetwork,'visible','off');
+    set(handles.Zoom,'visible','off');
+    set(handles.NodesID,'visible','off');
+    set(handles.LinksID,'visible','off');
+    set(handles.FontsizeENplotText,'visible','off');
+    set(handles.FontsizeENplot,'visible','off');
+
+    f=getframe(handles.axes1);
+    imwrite(f.cdata,[handles.B.InputFile(1:end-4),'.bmp'],'bmp');
+    figure(1);
+    imshow([handles.B.InputFile(1:end-4),'.bmp']);
+    save2pdf(handles.B.InputFile(1:end-4));
+    % graphs
+    set(handles.SaveNetwork,'visible','on');
+    set(handles.Zoom,'visible','on');
+    set(handles.NodesID,'visible','on');
+    set(handles.LinksID,'visible','on');
+    set(handles.FontsizeENplotText,'visible','on');
+    set(handles.FontsizeENplot,'visible','on');   
+    close(1);   
