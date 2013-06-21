@@ -197,6 +197,13 @@ function LoadInputFile_Callback(hObject, eventdata, handles)
         if exist([pwd,'\RESULTS\','h1.f'])==2
             delete([pwd,'\RESULTS\','h1.f'],'h1','-mat');
         end
+        if exist([pwd,'\RESULTS\','hNodesID.f'])==2
+            delete([pwd,'\RESULTS\','hNodesID.f'],'hNodesID','-mat');
+        end
+        if exist([pwd,'\RESULTS\','hLinksID.f'])==2
+            delete([pwd,'\RESULTS\','hLinksID.f'],'hLinksID','-mat');
+        end
+        
         pathname=[pwd,'\RESULTS\'];
         save([pwd,'\RESULTS\','pathname.File'],'pathname','-mat');
 
@@ -235,7 +242,10 @@ function LoadInputFile_Callback(hObject, eventdata, handles)
         set(handles.SaveNetwork,'visible','on');
         set(handles.Zoom,'visible','on');
         set(handles.NodesID,'visible','on');
-        set(handles.LinksID,'visible','on');
+        set(handles.LinksID,'visible','on');      
+        set(handles.NodesID,'value',0);
+        set(handles.LinksID,'value',0);
+        
         set(handles.FontsizeENplotText,'visible','on');
         set(handles.FontsizeENplot,'visible','on');
         set(handles.SplaceTable,'String','');
@@ -722,6 +732,17 @@ function LinksID_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 % Hint: get(hObject,'Value') returns toggle state of LinksID
+
+    if exist([pwd,'\RESULTS\','hNodesID.f'])==2
+        load([pwd,'\RESULTS\','hNodesID.f'],'hNodesID','-mat');
+        delete(hNodesID(:)); hNodesID=[];
+        save([pwd,'\RESULTS\','hNodesID.f'],'hNodesID','-mat');    
+    end
+    if exist([pwd,'\RESULTS\','hLinksID.f'])==2
+        load([pwd,'\RESULTS\','hLinksID.f'],'hLinksID','-mat');
+        delete(hLinksID(:)); hLinksID=[];
+        save([pwd,'\RESULTS\','hLinksID.f'],'hLinksID','-mat');
+    end
         
     FontSize = str2num(get(handles.FontsizeENplot,'String'));
     if  ~length(FontSize) || FontSize<0
@@ -736,19 +757,18 @@ function LinksID_Callback(hObject, eventdata, handles)
     value=get(handles.LinksID,'Value');
     if value==1
         set(handles.NodesID,'Value',0);
-        handles.B.plot('Links','yes','fontsize',FontSize);
-        axis on
-        set(handles.axes1,'Color','w')
-        set(handles.axes1,'XTick',[])
-        set(handles.axes1,'YTick',[])
-    else
-        if get(handles.NodesID,'Value')==0
-            handles.B.plot
-            axis on
-            set(handles.axes1,'Color','w')
-            set(handles.axes1,'XTick',[])
-            set(handles.axes1,'YTick',[])
+        
+        for i=1:handles.B.CountLinks
+            
+            x1=handles.B.CoordinatesXY(handles.B.NodesConnectingLinksIndex(i,1),1);
+            y1=handles.B.CoordinatesXY(handles.B.NodesConnectingLinksIndex(i,1),2);
+
+            x2=handles.B.CoordinatesXY(handles.B.NodesConnectingLinksIndex(i,2),1);
+            y2=handles.B.CoordinatesXY(handles.B.NodesConnectingLinksIndex(i,2),2);
+            
+            hLinksID(i)=text((x1+x2)/2,(y1+y2)/2,handles.B.LinkNameID(i),'FontSize',FontSize);
         end
+        save([pwd,'\RESULTS\','hLinksID.f'],'hLinksID','-mat');
     end
 
 % --- Executes on button press in NodesID.
@@ -758,7 +778,17 @@ function NodesID_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 % Hint: get(hObject,'Value') returns toggle state of NodesID
-
+    if exist([pwd,'\RESULTS\','hNodesID.f'])==2
+        load([pwd,'\RESULTS\','hNodesID.f'],'hNodesID','-mat');
+        delete(hNodesID(:)); hNodesID=[];
+        save([pwd,'\RESULTS\','hNodesID.f'],'hNodesID','-mat');    
+    end
+    if exist([pwd,'\RESULTS\','hLinksID.f'])==2
+        load([pwd,'\RESULTS\','hLinksID.f'],'hLinksID','-mat');
+        delete(hLinksID(:)); hLinksID=[];
+        save([pwd,'\RESULTS\','hLinksID.f'],'hLinksID','-mat');
+    end
+    
     FontSize = str2num(get(handles.FontsizeENplot,'String'));
     if  ~length(FontSize) || FontSize<0
         load([pwd,'\RESULTS\','ComWind.messsages'],'msg','-mat');
@@ -773,19 +803,11 @@ function NodesID_Callback(hObject, eventdata, handles)
     value=get(handles.NodesID,'Value');
     if value==1 
         set(handles.LinksID,'Value',0);
-        handles.B.plot('fontsize',FontSize,'nodes','yes')
-        axis on
-        set(handles.axes1,'Color','w')
-        set(handles.axes1,'XTick',[])
-        set(handles.axes1,'YTick',[])
-    else
-        if get(handles.LinksID,'Value')==0
-            handles.B.plot
-            axis on
-            set(handles.axes1,'Color','w')
-            set(handles.axes1,'XTick',[])
-            set(handles.axes1,'YTick',[])
+        for i=1:handles.B.CountNodes
+            xy{i}=handles.B.CoordinatesXY(i,:); 
+            hNodesID(i)=text(xy{i}(1),xy{i}(2),char(handles.B.NodeNameID(i)),'FontSize',FontSize);
         end
+        save([pwd,'\RESULTS\','hNodesID.f'],'hNodesID','-mat');
     end
 
 

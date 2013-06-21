@@ -202,7 +202,7 @@ classdef Epanet <handle
                 [obj.errorCode,linkFromNode,linkToNode] = ENgetlinknodes(i);
                 obj.NodesConnectingLinksIndex(i,:)= [linkFromNode,linkToNode];
                 obj.NodesConnectingLinksID(i,1) = obj.getLinkID(linkFromNode);
-                obj.NodesConnectingLinksID(i,2) = obj.getLinkID(linkFromNode);
+                obj.NodesConnectingLinksID(i,2) = obj.getLinkID(linkToNode);
                 %ENgetlinktype
                 [obj.errorCode,obj.LinkTypeIndex(i)] = ENgetlinktype(i);
                 obj.LinkTypeID(i)=obj.TYPELINK(obj.LinkTypeIndex(i)+1);
