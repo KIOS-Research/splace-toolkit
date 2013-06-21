@@ -404,22 +404,8 @@ function ComputeImpactMatrix_Callback(hObject, eventdata, handles)
 
     if exist('File0.File','file')==2 
         load([pwd,'\RESULTS\','File0.File'],'-mat');
-%         if exist([pathname,file0,'.c0'],'file')~=2
-%             load([pwd,'\RESULTS\','ComWind.messsages'],'msg','-mat');
-%             set(handles.LoadText,'Value',1);
-%             msg=[msg;{'>>First must be run  Simulate Scenarios.'}];
-%             set(handles.LoadText,'String',msg);
-%             set(handles.LoadText,'Value',length(msg)); 
-%             save([pwd,'\RESULTS\','ComWind.messsages'],'msg','-mat');
-%             set(handles.runMultipleScenarios,'enable','on');
-%             set(handles.LoadInputFile,'enable','on');
-%             set(handles.CreateScenarios,'enable','on');
-%             set(handles.SolveSensorPlacement,'enable','on');
-%             set(handles.Exit,'enable','on');
-%             return
-%         end
         
-        if exist([pathname,file0],'file')==2
+        if exist([pathname,file0],'file')==2 && exist([pathname,file0(1:end-1),'c0'],'file')==2
             if ~isempty(file0) 
                 load([pathname,file0],'-mat');
             else
@@ -427,6 +413,18 @@ function ComputeImpactMatrix_Callback(hObject, eventdata, handles)
             end
         else
             B.InputFile=[];
+            load([pwd,'\RESULTS\','ComWind.messsages'],'msg','-mat');
+            set(handles.LoadText,'Value',1);
+            msg=[msg;{'>>First must be run Simulate Scenarios.'}];
+            set(handles.LoadText,'String',msg);
+            set(handles.LoadText,'Value',length(msg)); 
+            save([pwd,'\RESULTS\','ComWind.messsages'],'msg','-mat');
+            set(handles.runMultipleScenarios,'enable','on');
+            set(handles.LoadInputFile,'enable','on');
+            set(handles.CreateScenarios,'enable','on');
+            set(handles.SolveSensorPlacement,'enable','on');
+            set(handles.Exit,'enable','on');
+            return
         end
 %         if ~strcmp(handles.B.InputFile,B.InputFile)             
 %             load([pwd,'\RESULTS\','ComWind.messsages'],'msg','-mat');
@@ -1005,7 +1003,7 @@ function Instructions_Callback(hObject, eventdata, handles)
 % hObject    handle to Instructions (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-
+web('Instructions.html');
 
 % --------------------------------------------------------------------
 function About_Callback(hObject, eventdata, handles)
