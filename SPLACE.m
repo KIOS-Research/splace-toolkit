@@ -619,6 +619,17 @@ function SplaceTable_Callback(hObject, eventdata, handles)
 
 % Hints: contents = cellstr(get(hObject,'String')) returns SplaceTable contents as cell array
 %        contents{get(hObject,'Value')} returns selected item from SplaceTable
+    if exist([pwd,'\RESULTS\','hNodesID.f'])==2
+        load([pwd,'\RESULTS\','hNodesID.f'],'hNodesID','-mat');
+        delete(hNodesID(:)); hNodesID=[];
+        save([pwd,'\RESULTS\','hNodesID.f'],'hNodesID','-mat');    
+    end
+    if exist([pwd,'\RESULTS\','hLinksID.f'])==2
+        load([pwd,'\RESULTS\','hLinksID.f'],'hLinksID','-mat');
+        delete(hLinksID(:)); hLinksID=[];
+        save([pwd,'\RESULTS\','hLinksID.f'],'hLinksID','-mat');
+    end
+    
     FontSize = str2num(get(handles.FontsizeENplot,'String'));
     if  ~length(FontSize) || FontSize<0
         load([pwd,'\RESULTS\','ComWind.messsages'],'msg','-mat');
@@ -663,7 +674,7 @@ function SplaceTable_Callback(hObject, eventdata, handles)
             plot(xy{u}(1),xy{u}(2),'o','LineWidth',2,'MarkerEdgeColor','r',...
                   'MarkerFaceColor','r',...
                   'MarkerSize',10)
-            h1(t)=text(xy{u}(1),xy{u}(2),['\fontsize{12} {\color{black}',char(handles.B.NodeNameID(IndexID(u))),'}']);
+            h1(t)=text(xy{u}(1),xy{u}(2),char(handles.B.NodeNameID(IndexID(u))),'FontSize',FontSize);
             t=t+1;
         end
         save([pwd,'\RESULTS\','h1.f'],'h1','IndexID','-mat');
@@ -743,6 +754,18 @@ function LinksID_Callback(hObject, eventdata, handles)
         delete(hLinksID(:)); hLinksID=[];
         save([pwd,'\RESULTS\','hLinksID.f'],'hLinksID','-mat');
     end
+
+    if exist([pwd,'\RESULTS\','h1.f'])==2
+        load([pwd,'\RESULTS\','h1.f'],'h1','IndexID','-mat');
+        for i=1:length(IndexID)
+            plot(handles.B.CoordinatesXY(IndexID(i),1),handles.B.CoordinatesXY(IndexID(i),2),'o','LineWidth',2,'MarkerEdgeColor','b',...
+            'MarkerFaceColor','b',...
+            'MarkerSize',10)
+            delete(h1(:)); h1=[];
+        end
+        IndexID=[];
+        save([pwd,'\RESULTS\','h1.f'],'h1','IndexID','-mat');
+    end
         
     FontSize = str2num(get(handles.FontsizeENplot,'String'));
     if  ~length(FontSize) || FontSize<0
@@ -787,6 +810,18 @@ function NodesID_Callback(hObject, eventdata, handles)
         load([pwd,'\RESULTS\','hLinksID.f'],'hLinksID','-mat');
         delete(hLinksID(:)); hLinksID=[];
         save([pwd,'\RESULTS\','hLinksID.f'],'hLinksID','-mat');
+    end
+
+    if exist([pwd,'\RESULTS\','h1.f'])==2
+        load([pwd,'\RESULTS\','h1.f'],'h1','IndexID','-mat');
+        for i=1:length(IndexID)
+            plot(handles.B.CoordinatesXY(IndexID(i),1),handles.B.CoordinatesXY(IndexID(i),2),'o','LineWidth',2,'MarkerEdgeColor','b',...
+            'MarkerFaceColor','b',...
+            'MarkerSize',10)
+            delete(h1(:)); h1=[];
+        end
+        IndexID=[];
+        save([pwd,'\RESULTS\','h1.f'],'h1','IndexID','-mat');
     end
     
     FontSize = str2num(get(handles.FontsizeENplot,'String'));

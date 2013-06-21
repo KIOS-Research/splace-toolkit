@@ -131,8 +131,8 @@ function start_Callback(hObject, eventdata, handles)
     set(handles.LoadText,'Value',length(msg)); 
     save([pwd,'\RESULTS\','ComWind.messsages'],'msg','-mat');
 %     set(handles.runMultipleScenarios,'enable','off');
-        
-% --- Executes on button press in load.
+
+    % --- Executes on button press in load.
 function load_Callback(hObject, eventdata, handles)
 % hObject    handle to load (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
