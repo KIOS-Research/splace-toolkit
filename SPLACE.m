@@ -414,7 +414,10 @@ function ComputeImpactMatrix_Callback(hObject, eventdata, handles)
 
     if exist('File0.File','file')==2 
         load([pwd,'\RESULTS\','File0.File'],'-mat');
-        
+        [path, name, ext] = fileparts(file0);
+        if length(ext)==0
+            file0=[file0,'.0'];
+        end
         if exist([pathname,file0],'file')==2 && exist([pathname,file0(1:end-1),'c0'],'file')==2
             if ~isempty(file0) 
                 load([pathname,file0],'-mat');
