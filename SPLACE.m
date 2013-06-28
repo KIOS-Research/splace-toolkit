@@ -1165,7 +1165,3 @@ function SaveNetwork_Callback(hObject, eventdata, handles)
     set(handles.FontsizeENplotText,'visible','on');
     set(handles.FontsizeENplot,'visible','on');   
     close(1);   
-<<<<<<< HEAD
-
-=======
->>>>>>> 0968691742dda2614e73ef3ec7c37fbc42ea0f09
