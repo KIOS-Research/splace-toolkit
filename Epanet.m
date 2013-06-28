@@ -136,14 +136,14 @@ classdef Epanet <handle
             end
                 
             
-            %ENMatlabSetup OK
+            %ENMatlabSetup  
             [obj.errorCode]=ENMatlabSetup('epanet2','epanet2.h');
             
-            %ENopen OK
+            %ENopen  
             [obj.errorCode] = ENopen(obj.PathFile, strcat(inpfile,'.rpt'), strcat(inpfile,'.out'));
             obj.InputFile=inpfile;
 
-            %ENgetcount OK
+            %ENgetcount  
             [obj.errorCode, obj.CountNodes] = ENgetcount(0);
             [obj.errorCode, obj.CountTanksReservoirs] = ENgetcount(1);
             [obj.errorCode, obj.CountLinks] = ENgetcount(2);
@@ -2147,19 +2147,19 @@ function CoordinatesXY=ENplot(obj,varargin)
         hh=strfind(highlightnodeindex,i);
         h(:,1)=plot(x, y,'o','LineWidth',2,'MarkerEdgeColor','b',...
                       'MarkerFaceColor','b',...
-                      'MarkerSize',10);
+                      'MarkerSize',5);
         legendString{1}= char('Junctions');
 
         % Plot Reservoirs
         if sum(strfind(obj.NodeReservoirIndex,i))
-            colornode = 'b';
+            colornode = 'g';
             if length(hh)
                 colornode = 'r';
             end
-            h(:,2)=plot(x,y,'s','LineWidth',2,'MarkerEdgeColor','b',...
-                      'MarkerFaceColor','b',...
+            h(:,2)=plot(x,y,'s','LineWidth',2,'MarkerEdgeColor','r',...
+                      'MarkerFaceColor','g',...
                       'MarkerSize',13);
-            plot(x,y,'s','LineWidth',2,'MarkerEdgeColor',colornode,...
+            plot(x,y,'s','LineWidth',2,'MarkerEdgeColor','r',...
                       'MarkerFaceColor',colornode,...
                       'MarkerSize',13);
                   
@@ -2167,15 +2167,15 @@ function CoordinatesXY=ENplot(obj,varargin)
         end
         % Plot Tanks
         if sum(strfind(obj.TankIndex,i)) 
-            colornode = 'b';
+            colornode = 'k';
             if length(hh)
                 colornode = 'r';
             end
-            h(:,3)=plot(x,y,'p','LineWidth',2,'MarkerEdgeColor','b',...
-              'MarkerFaceColor','b',...
+            h(:,3)=plot(x,y,'p','LineWidth',2,'MarkerEdgeColor','r',...
+              'MarkerFaceColor','k',...
               'MarkerSize',16);
           
-            plot(x,y,'p','LineWidth',2,'MarkerEdgeColor',colornode,...
+            plot(x,y,'p','LineWidth',2,'MarkerEdgeColor','r',...
                       'MarkerFaceColor',colornode,...
                       'MarkerSize',16);
 
@@ -2211,7 +2211,7 @@ function CoordinatesXY=ENplot(obj,varargin)
         
         hh=strfind(highlightlinkindex,i);
 
-        h(:,4)=line([x1,x2],[y1,y2],'LineWidth',2);
+        h(:,4)=line([x1,x2],[y1,y2],'LineWidth',1);
         legendString{4} = char('Pipes');
         % Plot Pumps
         if sum(strfind(obj.LinkPumpIndex,i)) 
@@ -2221,10 +2221,10 @@ function CoordinatesXY=ENplot(obj,varargin)
             end
             h(:,5)=plot((x1+x2)/2,(y1+y2)/2,'bv','LineWidth',2,'MarkerEdgeColor','b',...
                       'MarkerFaceColor','b',...
-                      'MarkerSize',7);
+                      'MarkerSize',5);
             plot((x1+x2)/2,(y1+y2)/2,'bv','LineWidth',2,'MarkerEdgeColor',colornode,...
                       'MarkerFaceColor',colornode,...
-                      'MarkerSize',7);
+                      'MarkerSize',5);
                   
            legendString{5} = char('Pumps');
         end

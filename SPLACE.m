@@ -36,7 +36,7 @@ function varargout = SPLACE(varargin)
 
 % Edit the above text to modify the response to help SPLACE
 
-% Last Modified by GUIDE v2.5 13-Jun-2013 13:52:02
+% Last Modified by GUIDE v2.5 28-Jun-2013 16:01:56
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -631,7 +631,7 @@ function SplaceTable_Callback(hObject, eventdata, handles)
     end
     
     FontSize = str2num(get(handles.FontsizeENplot,'String'));
-    if  ~length(FontSize) || FontSize<0
+    if  ~length(FontSize) || FontSize<0 || FontSize>20
         load([pwd,'\RESULTS\','ComWind.messsages'],'msg','-mat');
         msg=[msg;{'>>Give Font Size.'}];
         set(handles.LoadText,'String',msg);
@@ -650,10 +650,17 @@ function SplaceTable_Callback(hObject, eventdata, handles)
         if exist([pwd,'\RESULTS\','h1.f'])==2
             load([pwd,'\RESULTS\','h1.f'],'h1','IndexID','-mat');
             for i=1:length(IndexID)
-                plot(handles.B.CoordinatesXY(IndexID(i),1),handles.B.CoordinatesXY(IndexID(i),2),'o','LineWidth',2,'MarkerEdgeColor','b',...
-                'MarkerFaceColor','b',...
-                'MarkerSize',10)
-                delete(h1(:)); h1=[];
+                C1='b'; C2='b';
+                if sum(IndexID==handles.B.NodeReservoirIndex)
+                    C2='g'; C1='g';
+                elseif sum(IndexID==handles.B.TankIndex)
+                    C2='k'; C1='k';
+                end
+                plot(handles.B.CoordinatesXY(IndexID,1),handles.B.CoordinatesXY(IndexID,2),'o','LineWidth',2,'MarkerEdgeColor',C1,...
+                'MarkerFaceColor',C2,'MarkerSize',5);
+                if h1~=1
+                    delete(h1(:)); h1=[];
+                end
             end
             IndexID=[];
         end
@@ -673,7 +680,7 @@ function SplaceTable_Callback(hObject, eventdata, handles)
         for u=1:length(SensorsNodesID)
             plot(xy{u}(1),xy{u}(2),'o','LineWidth',2,'MarkerEdgeColor','r',...
                   'MarkerFaceColor','r',...
-                  'MarkerSize',10)
+                  'MarkerSize',5)
             h1(t)=text(xy{u}(1),xy{u}(2),char(handles.B.NodeNameID(IndexID(u))),'FontSize',FontSize);
             t=t+1;
         end
@@ -758,17 +765,24 @@ function LinksID_Callback(hObject, eventdata, handles)
     if exist([pwd,'\RESULTS\','h1.f'])==2
         load([pwd,'\RESULTS\','h1.f'],'h1','IndexID','-mat');
         for i=1:length(IndexID)
-            plot(handles.B.CoordinatesXY(IndexID(i),1),handles.B.CoordinatesXY(IndexID(i),2),'o','LineWidth',2,'MarkerEdgeColor','b',...
-            'MarkerFaceColor','b',...
-            'MarkerSize',10)
-            delete(h1(:)); h1=[];
+            C1='b'; C2='b';
+            if sum(IndexID==handles.B.NodeReservoirIndex)
+                C2='g'; C1='g';
+            elseif sum(IndexID==handles.B.TankIndex)
+                C2='k'; C1='k';
+            end
+            plot(handles.B.CoordinatesXY(IndexID,1),handles.B.CoordinatesXY(IndexID,2),'o','LineWidth',2,'MarkerEdgeColor',C1,...
+            'MarkerFaceColor',C2,'MarkerSize',5);
+            if h1~=1
+                delete(h1(:)); h1=[];
+            end
         end
         IndexID=[];
         save([pwd,'\RESULTS\','h1.f'],'h1','IndexID','-mat');
     end
         
     FontSize = str2num(get(handles.FontsizeENplot,'String'));
-    if  ~length(FontSize) || FontSize<0
+    if  ~length(FontSize) || FontSize<0 || FontSize>20
         load([pwd,'\RESULTS\','ComWind.messsages'],'msg','-mat');
         msg=[msg;{'>>Give Font Size.'}];
         set(handles.LoadText,'String',msg);
@@ -815,17 +829,24 @@ function NodesID_Callback(hObject, eventdata, handles)
     if exist([pwd,'\RESULTS\','h1.f'])==2
         load([pwd,'\RESULTS\','h1.f'],'h1','IndexID','-mat');
         for i=1:length(IndexID)
-            plot(handles.B.CoordinatesXY(IndexID(i),1),handles.B.CoordinatesXY(IndexID(i),2),'o','LineWidth',2,'MarkerEdgeColor','b',...
-            'MarkerFaceColor','b',...
-            'MarkerSize',10)
-            delete(h1(:)); h1=[];
+            C1='b'; C2='b';
+            if sum(IndexID==handles.B.NodeReservoirIndex)
+                C2='g'; C1='g';
+            elseif sum(IndexID==handles.B.TankIndex)
+                C2='k'; C1='k';
+            end
+            plot(handles.B.CoordinatesXY(IndexID,1),handles.B.CoordinatesXY(IndexID,2),'o','LineWidth',2,'MarkerEdgeColor',C1,...
+            'MarkerFaceColor',C2,'MarkerSize',5);
+            if h1~=1
+                delete(h1(:)); h1=[];
+            end
         end
         IndexID=[];
         save([pwd,'\RESULTS\','h1.f'],'h1','IndexID','-mat');
     end
     
     FontSize = str2num(get(handles.FontsizeENplot,'String'));
-    if  ~length(FontSize) || FontSize<0
+    if  ~length(FontSize) || FontSize<0 || FontSize>20
         load([pwd,'\RESULTS\','ComWind.messsages'],'msg','-mat');
         msg=[msg;{'>>Give Font Size.'}];
         set(handles.LoadText,'String',msg);
@@ -1129,7 +1150,10 @@ function SaveNetwork_Callback(hObject, eventdata, handles)
     imwrite(f.cdata,[handles.B.InputFile(1:end-4),'.bmp'],'bmp');
     figure(1);
     imshow([handles.B.InputFile(1:end-4),'.bmp']);
-    save2pdf(handles.B.InputFile(1:end-4));
+
+    % save to pdf and bmp
+    print(gcf,'-dpdf',handles.B.InputFile(1:end-4),sprintf('-r%d',150));
+    
     % graphs
     set(handles.SaveNetwork,'visible','on');
     set(handles.Zoom,'visible','on');
@@ -1138,3 +1162,4 @@ function SaveNetwork_Callback(hObject, eventdata, handles)
     set(handles.FontsizeENplotText,'visible','on');
     set(handles.FontsizeENplot,'visible','on');   
     close(1);   
+
