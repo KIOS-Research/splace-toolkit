@@ -131,7 +131,7 @@ classdef Epanet <handle
                 inpfile=varargin{1};
                 obj.PathFile=pathfile;
             elseif nargin==1
-                inpfile=which(pathfile);
+                inpfile=pathfile;
                 obj.PathFile=which(pathfile);
             end
                 
@@ -316,7 +316,7 @@ classdef Epanet <handle
             
             %ENgetVersion
             [obj.errorCode, obj.Version] = ENgetversion();
-                        
+                                    
         end
         
         %%%%%%%%%%%%%%%%% ADD FUNCTIONS %%%%%%%%%%%%%%%%%
@@ -1320,34 +1320,18 @@ classdef Epanet <handle
 %                 value(index)=[nValues, xValues, yValues];
 %             end
 %         end        
-        
-        % MSX EPANET
-        
-%         %MSXaddpattern
-%         function MSXaddPattern(obj,NodeNameID)
-%             [obj.errorCode] = MSXaddpattern(NodeNameID);
-%         end
-%
-%         %MSXopen
-%         function MSX(obj,msxname)
-%             MSXMatlabSetup('epanetmsx','epanetmsx.h')
-%             [obj.errorCode] = MSXopen(msxname);
-%         end
-%
-%         %MSXMatlabCleanup
-%         function MSXunload(obj)
-%             MSXMatlabCleanup('epanetmsx')
-%         end
-        %
-        
-        
+       
         % ENplot
         function plot(obj,varargin)    
             obj.CoordinatesXY=ENplot(obj,varargin{:});
         end
         
         function CoordinatesXY = getCoordinates(inpname)
-            CoordinatesXY = Getnodeinfo(inpname);
+            [errcode,vx,vy,vertx,verty]  = Getnodeinfo(inpname);
+            CoordinatesXY{1} = vx;
+            CoordinatesXY{2} = vy;
+            CoordinatesXY{3} = vertx;
+            CoordinatesXY{4} = verty;
         end
         
     end
@@ -2115,7 +2099,7 @@ function CoordinatesXY=ENplot(obj,varargin)
 
     cla
     % Get node names and x, y coordiantes
-    CoordinatesXY = Getnodeinfo(obj);
+    CoordinatesXY = getCoordinates(obj);
 
     if isa(highlightnode,'cell')       
         for i=1:length(highlightnode)
@@ -2141,8 +2125,8 @@ function CoordinatesXY=ENplot(obj,varargin)
 
     % Coordinates for node FROM
     for i=1:obj.CountNodes
-        [x] = double(CoordinatesXY(i,1));
-        [y] = double(CoordinatesXY(i,2));
+        [x] = double(CoordinatesXY{1}(i));
+        [y] = double(CoordinatesXY{2}(i));
 
         hh=strfind(highlightnodeindex,i);
         h(:,1)=plot(x, y,'o','LineWidth',2,'MarkerEdgeColor','b',...
@@ -2200,18 +2184,20 @@ function CoordinatesXY=ENplot(obj,varargin)
     for i=1:obj.CountLinks
         
         if obj.NodesConnectingLinksIndex(:,1) 
-            x1 = double(CoordinatesXY(obj.NodesConnectingLinksIndex(i,1),1));
-            y1 = double(CoordinatesXY(obj.NodesConnectingLinksIndex(i,1),2));
+            x1 = double(CoordinatesXY{1}(obj.NodesConnectingLinksIndex(i,1)));
+            y1 = double(CoordinatesXY{2}(obj.NodesConnectingLinksIndex(i,1)));
         end
 
         if obj.NodesConnectingLinksIndex(:,2) 
-            x2 = double(CoordinatesXY(obj.NodesConnectingLinksIndex(i,2),1));
-            y2 = double(CoordinatesXY(obj.NodesConnectingLinksIndex(i,2),2));
+            x2 = double(CoordinatesXY{1}(obj.NodesConnectingLinksIndex(i,2)));
+            y2 = double(CoordinatesXY{2}(obj.NodesConnectingLinksIndex(i,2)));
         end
         
         hh=strfind(highlightlinkindex,i);
 
-        h(:,4)=line([x1,x2],[y1,y2],'LineWidth',1);
+%         h(:,4)=line([x1,x2],[y1,y2],'LineWidth',1);
+        h(:,4)=line([x1 CoordinatesXY{3}{i} x2],[y1 CoordinatesXY{4}{i} y2],'LineWidth',1);
+        
         legendString{4} = char('Pipes');
         % Plot Pumps
         if sum(strfind(obj.LinkPumpIndex,i)) 
@@ -2261,10 +2247,13 @@ function CoordinatesXY=ENplot(obj,varargin)
 
     legend(hh,String);
     % Axis OFF and se Background
-    [yxmax,~]=max(CoordinatesXY);
-    [yxmin,~]=min(CoordinatesXY);
-    xmax=yxmax(1); ymax=yxmax(2);
-    xmin=yxmin(1); ymin=yxmin(2);
+    [xmax,~]=max(CoordinatesXY{1});
+    [xmin,~]=min(CoordinatesXY{1});
+    [ymax,~]=max(CoordinatesXY{2});
+    [ymin,~]=min(CoordinatesXY{2});
+
+%     xmax=yxmax(1); ymax=yxmax(2);
+%     xmin=yxmin(1); ymin=yxmin(2);
     
     xlim([xmin-((xmax-xmin)*.1),xmax+((xmax-xmin)*.1)])
     ylim([ymin-(ymax-ymin)*.1,ymax+(ymax-ymin)*.1])
@@ -2273,78 +2262,77 @@ function CoordinatesXY=ENplot(obj,varargin)
 end
 
 
-function CoordinatesXY = Getnodeinfo(obj)
-    fid = fopen(obj.InputFile, 'r');
-    breakS=0;t=1;ee=0;
-    while ~feof(fid)
-        tline = fgetl(fid);
-        if tline==-1
-            warning('EPANET:warning','Cannot find error.');
-            CoordinatesXY(:)=0;
-            return
-        end
-        a = regexp(tline, '\s*','split');
-        for i=1:length(a) 
-            rr = regexp(a,'\w*[\w*]\w*','split');
-            check_brackets = rr{:};
-            ch1 = strcmp(check_brackets,'[');
-            ch2 = strcmp(check_brackets,']');
+function [errcode,vx,vy,vertx,verty] = Getnodeinfo(obj)
+    % Initialize 
+    vx = NaN(obj.CountNodes,1);
+    vy = NaN(obj.CountNodes,1);
+    vertx = cell(obj.CountLinks,1);
+    verty = cell(obj.CountLinks,1);
+    nvert = zeros(obj.CountLinks,1);
 
-            if strcmp(char(a{i}),'[COORDINATES]')   
-                breakS=1; 
-            elseif ch1(1)==1 && ch2(2)==1 && breakS==1
-                if (isempty(a{i})&& breakS==1) break; end
-                ee=1;
-            end
-            if strcmp(a{i},'[END]') && breakS==0
-                warning('EPANET:warning','No coordinates.');
-                warning('EPANET:warning','Define temporary coordinate.');
-                u=1;
-                for t=1:obj.CountNodes
-                    CoordinatesXY(t,1) = 100 + 10*rand(1,1);
-                    CoordinatesXY(t,2) = 30 + 10*rand(1,1);
-                    u=u+5;
-                end
-                return
-            end
-        end
-        
-        if breakS==1
-            coord{t}=tline;
-            t=t+1;
-        end        
-        if ee==1 
-            break; 
-        end
+    % Open epanet input file
+    [EPANETIN,errmsg] = fopen( obj.InputFile, 'rt' );
+    if EPANETIN < 0
+        disp errmsg
+        return
     end
-    fclose(fid); 
 
-    i=0;u=1;r=1;
-    for t = 1:length(coord)
-        c = coord{t};
-        a = regexp(c, '\s*','split');
-        y=1;
-        while y < length(a)+1
-            j(y) = isempty(a{y});
-            y=y+1;
-        end
-        j = sum(j);
-        if j == length(a)
-            % skip
-        elseif isempty(c)
-            % skip
-        elseif strfind(c,'[')
-            % skip
-        elseif strfind(c, ';')
-            % skip 
-        else
-            i=i+1;
-            if isempty(a{r})
-                r=r+1;
+    sect = 0;
+    % Read each line from input file.
+    while 1
+        tline = fgetl(EPANETIN);
+        if ~ischar(tline),   break,   end
+
+        % Get first token in the line
+        tok = strtok(tline);
+
+        % Skip blank lines and comments
+        if isempty(tok), continue, end
+        if (tok(1) == ';'), continue, end
+
+        % Check if at start of a new COOR or VERT section
+        if (tok(1) == '[')
+            % [COORDINATES] section
+            if strcmpi(tok(1:5),'[COOR')
+                sect = 1;
+                continue;
+            % [VERTICES] section
+            elseif strcmpi(tok(1:5),'[VERT')
+                sect = 2;
+                continue;
+            % [END]
+            elseif strcmpi(tok(1:4),'[END')
+                break;
+            else
+                sect = 0;
+                continue;
             end
-            CoordinatesXY(u,1) = str2double(a(r+1));
-            CoordinatesXY(u,2) = str2double(a(r+2));
-            u=u+1;
+        end
+
+        if sect == 0
+            continue;
+
+        % Coordinates
+        elseif sect == 1
+            A = textscan(tline,'%s %f %f');
+            % get the node index
+            [errcode,index] = ENgetnodeindex(char(A{1}));
+            if errcode ~=0 
+                return; 
+            end
+            vx(index) = A{2};
+            vy(index) = A{3};
+
+        % Vertices
+        elseif sect == 2
+            A = textscan(tline,'%s %f %f');
+            [errcode,index] = ENgetlinkindex(char(A{1}));
+            if errcode ~=0 
+                return; 
+            end
+            nvert(index) = nvert(index) + 1;
+            vertx{index}(nvert(index)) = A{2};
+            verty{index}(nvert(index)) = A{3};
         end
     end
 end

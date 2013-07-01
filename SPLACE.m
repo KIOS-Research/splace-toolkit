@@ -659,7 +659,7 @@ function SplaceTable_Callback(hObject, eventdata, handles)
                 elseif sum(IndexID==handles.B.TankIndex)
                     C2='k'; C1='k';
                 end
-                plot(handles.B.CoordinatesXY(IndexID,1),handles.B.CoordinatesXY(IndexID,2),'o','LineWidth',2,'MarkerEdgeColor',C1,...
+                plot(handles.B.CoordinatesXY{1}(IndexID(i)),handles.B.CoordinatesXY{2}(IndexID(i)),'o','LineWidth',2,'MarkerEdgeColor',C1,...
                 'MarkerFaceColor',C2,'MarkerSize',5);
                 if h1~=1
                     delete(h1(:)); h1=[];
@@ -676,15 +676,16 @@ function SplaceTable_Callback(hObject, eventdata, handles)
 %         SensorsNodesID=tline(6:end);
         for i=1:length(SensorsNodesID)
             IndexID(i)= find(strcmpi(handles.B.NodeNameID,SensorsNodesID(i)));
-            xy{i}=handles.B.CoordinatesXY(find(strcmpi(handles.B.NodeNameID,SensorsNodesID(i))),:);
+            x{i}=handles.B.CoordinatesXY{1}(find(strcmpi(handles.B.NodeNameID,SensorsNodesID(i))));
+            y{i}=handles.B.CoordinatesXY{2}(find(strcmpi(handles.B.NodeNameID,SensorsNodesID(i))));
         end
             
         t=1;
         for u=1:length(SensorsNodesID)
-            plot(xy{u}(1),xy{u}(2),'o','LineWidth',2,'MarkerEdgeColor','r',...
+            plot(x{u}(1),y{u}(1),'o','LineWidth',2,'MarkerEdgeColor','r',...
                   'MarkerFaceColor','r',...
                   'MarkerSize',5)
-            h1(t)=text(xy{u}(1),xy{u}(2),char(handles.B.NodeNameID(IndexID(u))),'FontSize',FontSize);
+            h1(t)=text(x{u}(1),y{u}(1),char(handles.B.NodeNameID(IndexID(u))),'FontSize',FontSize);
             t=t+1;
         end
         save([pwd,'\RESULTS\','h1.f'],'h1','IndexID','-mat');
@@ -774,7 +775,7 @@ function LinksID_Callback(hObject, eventdata, handles)
             elseif sum(IndexID==handles.B.TankIndex)
                 C2='k'; C1='k';
             end
-            plot(handles.B.CoordinatesXY(IndexID,1),handles.B.CoordinatesXY(IndexID,2),'o','LineWidth',2,'MarkerEdgeColor',C1,...
+            plot(handles.B.CoordinatesXY{1}(IndexID(i)),handles.B.CoordinatesXY{2}(IndexID(i)),'o','LineWidth',2,'MarkerEdgeColor',C1,...
             'MarkerFaceColor',C2,'MarkerSize',5);
             if h1~=1
                 delete(h1(:)); h1=[];
@@ -800,11 +801,11 @@ function LinksID_Callback(hObject, eventdata, handles)
         
         for i=1:handles.B.CountLinks
             
-            x1=handles.B.CoordinatesXY(handles.B.NodesConnectingLinksIndex(i,1),1);
-            y1=handles.B.CoordinatesXY(handles.B.NodesConnectingLinksIndex(i,1),2);
+            x1=handles.B.CoordinatesXY{1}(handles.B.NodesConnectingLinksIndex(i,1));
+            y1=handles.B.CoordinatesXY{2}(handles.B.NodesConnectingLinksIndex(i,1));
 
-            x2=handles.B.CoordinatesXY(handles.B.NodesConnectingLinksIndex(i,2),1);
-            y2=handles.B.CoordinatesXY(handles.B.NodesConnectingLinksIndex(i,2),2);
+            x2=handles.B.CoordinatesXY{1}(handles.B.NodesConnectingLinksIndex(i,2));
+            y2=handles.B.CoordinatesXY{2}(handles.B.NodesConnectingLinksIndex(i,2));
             
             hLinksID(i)=text((x1+x2)/2,(y1+y2)/2,handles.B.LinkNameID(i),'FontSize',FontSize);
         end
@@ -838,7 +839,7 @@ function NodesID_Callback(hObject, eventdata, handles)
             elseif sum(IndexID==handles.B.TankIndex)
                 C2='k'; C1='k';
             end
-            plot(handles.B.CoordinatesXY(IndexID,1),handles.B.CoordinatesXY(IndexID,2),'o','LineWidth',2,'MarkerEdgeColor',C1,...
+            plot(handles.B.CoordinatesXY{1}(IndexID(i)),handles.B.CoordinatesXY{2}(IndexID(i)),'o','LineWidth',2,'MarkerEdgeColor',C1,...
             'MarkerFaceColor',C2,'MarkerSize',5);
             if h1~=1
                 delete(h1(:)); h1=[];
@@ -863,8 +864,7 @@ function NodesID_Callback(hObject, eventdata, handles)
     if value==1 
         set(handles.LinksID,'Value',0);
         for i=1:handles.B.CountNodes
-            xy{i}=handles.B.CoordinatesXY(i,:); 
-            hNodesID(i)=text(xy{i}(1),xy{i}(2),char(handles.B.NodeNameID(i)),'FontSize',FontSize);
+            hNodesID(i)=text(handles.B.CoordinatesXY{1}(i),handles.B.CoordinatesXY{2}(i),char(handles.B.NodeNameID(i)),'FontSize',FontSize);
         end
         save([pwd,'\RESULTS\','hNodesID.f'],'hNodesID','-mat');
     end
