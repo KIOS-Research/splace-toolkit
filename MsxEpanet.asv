@@ -186,18 +186,13 @@ classdef MsxEpanet <handle
         end
         
         %MSXsetparameter
-        function setParameterNodeValueMsx(obj, nodeIndex, value)
+        function setParameterNodeMsx(obj, param, value)
+            [obj.errorCode] = MSXsetparameter(0, index, param, value);
             for i=1:length(value)
-                [obj.errorCode] = MSXsetparameter(0, nodeIndex, i, value(i));
+                [obj.errorCode] = MSXsetparameter(0, i, value(i));
             end
         end
-        
-        function setParameterLinkValueMsx(obj, linkIndex, value)
-            for i=1:length(value)
-                [obj.errorCode] = MSXsetparameter(1, linkIndex, i, value(i));
-            end
-        end
-        
+                
         %MSXsetpattern
         function setPatternMsx(obj,index,patternVector)
             nfactors=length(patternVector);
@@ -545,6 +540,7 @@ classdef MsxEpanet <handle
             [obj.errorCode]=MSXsaveoutfile(outfname);
         end
         
+        
         %MSXusehydfile
         function useHydraulicFileMsx(obj,hydname)
             [obj.errorCode]=MSXusehydfile(hydname);
@@ -794,30 +790,13 @@ function [errcode] = MSXaddpattern(patid)
     end
 end
 
-%%%%%%%
+
 function [errcode] = MSXusehydfile(hydfname)
-    [errcode] = ENsaveH();
-    [errcode] = ENsavehydfile('test.hyd');
     [errcode]=calllib('epanetmsx','MSXusehydfile',hydfname);
     if errcode 
         MSXerror(errcode); 
     end
 end
-
-function [errcode] = ENsaveH()
-    [errcode]=calllib('epanet2','ENsaveH');
-    if errcode 
-        ENerror(errcode); 
-    end
-end
-
-function [errcode] = ENsavehydfile(fname)
-    [errcode]=calllib('epanet2','ENsavehydfile',fname);
-    if errcode 
-        ENerror(errcode); 
-    end
-end
-%%%%%%%%
 
 function [errcode, t, tleft] = MSXstep()
     t=0;
