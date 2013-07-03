@@ -198,6 +198,19 @@ classdef MsxEpanet <handle
             end
         end
         
+        %MSXsetinitqual
+        function setInitqualNodeValueMsx(obj, nodeIndex, value)
+            for i=1:length(value)
+                [obj.errorCode] = MSXsetinitqual(0, nodeIndex, i, value(i));
+            end
+        end
+        
+        function setInitqualLinkValueMsx(obj, linkIndex, value)
+            for i=1:length(value)
+                [obj.errorCode] = MSXsetinitqual(1, linkIndex, i, value(i));
+            end
+        end
+        
         %MSXsetpattern
         function setPatternMsx(obj,index,patternVector)
             nfactors=length(patternVector);
@@ -217,6 +230,24 @@ classdef MsxEpanet <handle
         end
      
         %%%%%%%%%%%%%%%%% GET FUNCTIONS %%%%%%%%%%%%%%%%%
+        
+        %MSXgetinitqual
+        function value = getInitqualNodeValueMsx(obj)
+            for i=1:obj.CountNodes
+                for j=1:obj.getCountSpeciesMsx
+                   [obj.errorCode, value{i}(j)] = MSXgetinitqual(0,i,j);   
+                end
+            end
+        end
+        
+        function value = getInitqualLinkValueMsx(obj)
+            for i=1:obj.CountLinks
+                for j=1:obj.getCountSpeciesMsx
+                   [obj.errorCode, value{i}(j)] = MSXgetinitqual(1,i,j);   
+                end
+            end
+        end
+            
         % MSXgetparameter
         function value = getParameterNameIDMsx(obj)
             if ~obj.getCountParametersMsx
@@ -754,6 +785,13 @@ end
 
 function [errcode] = MSXsetparameter(type, index, param, value)
     [errcode]=calllib('epanetmsx','MSXsetparameter',type,index,param,value);
+    if errcode 
+        MSXerror(errcode); 
+    end
+end
+
+function [errcode] = MSXsetinitqual(type,index,species,value)
+    [errcode]=calllib('epanetmsx','MSXsetinitqual',type,index,species,value);
     if errcode 
         MSXerror(errcode); 
     end
