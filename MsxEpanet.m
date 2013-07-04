@@ -25,14 +25,21 @@ classdef MsxEpanet <handle
         
         CountNodes;
         CountLinks;
+        CountPipes;
+        CountTanks;
+        TankIndex;
+            
+        TermsFormula;
+        PipesFormula;
+        TanksFormula;
         
         ConstantNameIDMsx;
         ConstantValueMsx;
         
         ParameterNameIDMsx;
         ParametersIndexMsx;
-        NodeParameterValueMsx;
-        LinkParameterValueMsx;
+        TankParameterValueMsx;
+        PipeParameterValueMsx;
 
         PatternIDMsx;
         PatternIndexMsx;
@@ -50,10 +57,11 @@ classdef MsxEpanet <handle
         
         SourceTypeMsx;
         SourceLevelMsx;
-        SourceIDMsx;
+        SourceNodeIDMsx;
         SourcePatternIndexMsx; 
         SourcePatternIDMsx;
-        SourceSpeciesNameIDMsx;
+%         SourceSpeciesNameIDMsx;
+        SourceAllMsx;
     
     end
     methods
@@ -75,7 +83,12 @@ classdef MsxEpanet <handle
             obj.MsxFile=msxfile;
             obj.CountNodes = B.CountNodes;
             obj.CountLinks = B.CountLinks;
+            obj.CountTanks= B.CountTanks;
+            obj.CountPipes = B.CountPipes;
+            obj.TankIndex = B.TankIndex;
 
+            [obj.TermsFormula,obj.PipesFormula,obj.TanksFormula] = GetFormulas(msxfile);
+            
             %MSXgetcount  
             [obj.errorCode, obj.CountSpeciesMsx] = MSXgetcount(3);
             [obj.errorCode, obj.CountConstantsMsx] = MSXgetcount(6);
@@ -106,16 +119,17 @@ classdef MsxEpanet <handle
                 %MSXgetindex
                 [obj.errorCode, obj.ParametersIndexMsx(i)] = MSXgetindex(obj,5,obj.ParameterNameIDMsx{i}); 
             end
-            for i=1:obj.CountNodes
+            for i=1:length(obj.CountTanks)
                 for j=1:obj.CountParametersMsx
-                   [obj.errorCode, obj.NodeParameterValueMsx{i}(j)] = MSXgetparameter(0,i,j);   
+                   [obj.errorCode, obj.TankParameterValueMsx{i}(j)] = MSXgetparameter(0,obj.CountTanks(i),j);   
                 end
             end
-            for i=1:B.CountLinks
+            for i=1:B.CountPipes
                 for j=1:obj.CountParametersMsx
-                   [obj.errorCode, obj.LinkParameterValueMsx{i}(j)] = MSXgetparameter(1,i,j);   
+                   [obj.errorCode, obj.PipeParameterValueMsx{i}(j)] = MSXgetparameter(1,i,j);   
                 end
             end
+            
             %MSXgetpatternlen
             for i=1:obj.CountPatternsMsx
                 [obj.errorCode, len] = MSXgetIDlen(7,i);
@@ -142,12 +156,12 @@ classdef MsxEpanet <handle
                    [obj.errorCode, obj.SourceTypeMsx{i}{j},obj.SourceLevelMsx{i}(j),obj.SourcePatternIndexMsx{i}(j)] = MSXgetsource(i,j);
                    [obj.errorCode, len] = MSXgetIDlen(7,j);
                    [obj.errorCode,obj.SourcePatternIDMsx{i}{j}] = MSXgetID(7,obj.SourcePatternIndexMsx{i}(j),len);
-                   obj.SourceIDMsx{i}(j) = B.NodeNameID(i);
                    [obj.errorCode, len] = MSXgetIDlen(3,j);
-                   [obj.errorCode,obj.SourceSpeciesNameIDMsx{i}{j}] = MSXgetID(3,j,len);
+%                    [obj.errorCode,obj.SourceSpeciesNameIDMsx{i}{j}] = MSXgetID(3,j,len);
                 end
+                   obj.SourceNodeIDMsx{i} = B.NodeNameID(i);
             end
-
+            obj.SourceAllMsx={obj.SourceTypeMsx,obj.SourceLevelMsx,obj.SourcePatternIndexMsx,obj.SourcePatternIDMsx,obj.SourceNodeIDMsx};
         end
         
         %%%%%%%%%%%%%%%%% SOLVE FUNCTIONS %%%%%%%%%%%%%%%%%
@@ -177,7 +191,11 @@ classdef MsxEpanet <handle
         end
         
         %%%%%%%%%%%%%%%%% SET FUNCTIONS %%%%%%%%%%%%%%%%%
-    
+        %MSXsetsource
+        function setSourceMsx(obj, node, species, type, level, pat)
+            MSXsetsource(node, species, type, level, pat);
+        end
+
         %MSXsetconstant  	
         function setConstantValueMsx(obj, value)
             for i=1:length(value)
@@ -186,15 +204,19 @@ classdef MsxEpanet <handle
         end
         
         %MSXsetparameter
-        function setParameterNodeValueMsx(obj, nodeIndex, value)
+        function setParameterTankValueMsx(obj, tankIndex, value)
+            if ~sum(tankIndex==obj.TankIndex)
+                fprintf('>> Invalid Tank Index <<\n');obj.TankIndex
+                return;
+            end
             for i=1:length(value)
-                [obj.errorCode] = MSXsetparameter(0, nodeIndex, i, value(i));
+                [obj.errorCode] = MSXsetparameter(0, tankIndex, i, value(i));
             end
         end
         
-        function setParameterLinkValueMsx(obj, linkIndex, value)
+        function setParameterPipeValueMsx(obj, pipeIndex, value)
             for i=1:length(value)
-                [obj.errorCode] = MSXsetparameter(1, linkIndex, i, value(i));
+                [obj.errorCode] = MSXsetparameter(1, pipeIndex, i, value(i));
             end
         end
         
@@ -231,6 +253,17 @@ classdef MsxEpanet <handle
      
         %%%%%%%%%%%%%%%%% GET FUNCTIONS %%%%%%%%%%%%%%%%%
         
+        %MSXgetsource
+        function value = getSourcesMsx(obj)
+            for i=1:obj.CountNodes
+                for j=1:obj.CountSpeciesMsx 
+                   [obj.errorCode, obj.SourceTypeMsx{i}{j},obj.SourceLevelMsx{i}(j),obj.SourcePatternIndexMsx{i}(j)] = MSXgetsource(i,j);
+                end
+            end
+            obj.SourceAllMsx={obj.SourceTypeMsx,obj.SourceLevelMsx,obj.SourcePatternIndexMsx,obj.SourceNodeIDMsx};
+            value=obj.SourceAllMsx;
+        end
+        
         %MSXgetinitqual
         function value = getInitqualNodeValueMsx(obj)
             for i=1:obj.CountNodes
@@ -249,32 +282,23 @@ classdef MsxEpanet <handle
         end
             
         % MSXgetparameter
-        function value = getParameterNameIDMsx(obj)
+        function value = getParameterTankValueMsx(obj)
+            value={};
             if ~obj.getCountParametersMsx
                 value=0;return;
             end
-            for i=1:obj.CountParametersMsx
-                [obj.errorCode, len] = MSXgetIDlen(5,i);
-                [obj.errorCode, value{i}] = MSXgetID(5,i,len); 
-            end
-        end
-        
-        function value = getParameterNodeValueMsx(obj)
-            if ~obj.getCountParametersMsx
-                value=0;return;
-            end
-            for i=1:obj.CountNodes
+            for i=1:length(obj.CountTanks)
                 for j=1:obj.CountParametersMsx
-                   [obj.errorCode, value{i}(j)] = MSXgetparameter(0,i,j);   
+                   [obj.errorCode, value{obj.TankIndex(i)}(j)] = MSXgetparameter(0,obj.TankIndex(i),j);   
                 end
             end
         end
         
-        function value = getParameterLinkValueMsx(obj)
+        function value = getParameterPipeValueMsx(obj)
             if ~obj.getCountParametersMsx
                 value=0;return;
             end
-            for i=1:obj.CountLinks
+            for i=1:obj.CountPipes
                 for j=1:obj.CountParametersMsx
                    [obj.errorCode, value{i}(j)] = MSXgetparameter(1,i,j);   
                 end
@@ -673,9 +697,9 @@ function [errcode, value] = MSXgetconstant(index)
     end
 end
 
-function [errcode, value] = MSXgetparameter(obj,index,param)
+function [errcode, value] = MSXgetparameter(type,index,param)
     value=0;
-    [errcode,value]=calllib('epanetmsx','MSXgetparameter',obj,index,param,value);
+    [errcode,value]=calllib('epanetmsx','MSXgetparameter',type,index,param,value);
     if errcode 
         MSXerror(errcode);
     end
@@ -895,5 +919,79 @@ function [errcode, value] = MSXgetqual(type, index, species)
     [errcode,value]=calllib('epanetmsx','MSXgetqual',type,index,species,value);
     if errcode 
         MSXerror(errcode); 
+    end
+end
+
+function [errcode] = MSXsetsource(node,species,type,level,pat)
+    [errcode]=calllib('epanetmsx','MSXsetsource',node,species,type,level,pat);
+    if errcode
+        MSXerror(errcode); 
+    end
+end
+
+
+function  [Terms,Pipes,Tanks] = GetFormulas(msxname)
+    % Open epanet input file
+    [EPANETIN,errmsg] = fopen( msxname, 'rt' );
+    if EPANETIN < 0
+        disp errmsg
+        return
+    end
+    Terms={};
+    Pipes={};
+    Tanks={};
+
+    sect=0; i=1; t=1; k=1;
+    % Read each line from msx file.
+    while 1
+        tline = fgetl(EPANETIN);
+        if ~ischar(tline),   break,   end
+
+        % Get first token in the line
+        tok = strtok(tline);
+
+        % Skip blank lines and comments
+        if isempty(tok), continue, end
+        if (tok(1) == ';'), continue, end
+
+        if (tok(1) == '[')
+            % [TERMS] section
+            if strcmpi(tok(1:5),'[TERM')
+                sect = 1;
+                continue;
+            % [PIPES] section
+            elseif strcmpi(tok(1:5),'[PIPE')
+                sect = 2;
+                continue;
+            % [TANKS]
+            elseif strcmpi(tok(1:5),'[TANK')
+                sect = 3;
+                continue;
+                % [END]
+            elseif strcmpi(tok(1:4),'[END')
+                break;
+            else
+                sect = 0;
+                continue;
+            end
+        end
+
+        if sect == 0
+            continue;
+
+        % Terms
+        elseif sect == 1
+            Terms{i} = tline;
+            i=i+1;
+        % Pipes
+        elseif sect == 2
+            Pipes{t} = tline;
+            t=t+1;
+        % Tanks
+        elseif sect == 3
+            Tanks{k} = tline;
+            k=k+1;
+        end        
+        
     end
 end
