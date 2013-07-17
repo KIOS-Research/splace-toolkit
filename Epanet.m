@@ -2271,16 +2271,16 @@ function [errcode,vx,vy,vertx,verty] = Getnodeinfo(obj)
     nvert = zeros(obj.CountLinks,1);
 
     % Open epanet input file
-    [EPANETIN,errmsg] = fopen( obj.InputFile, 'rt' );
-    if EPANETIN < 0
-        disp errmsg
+    [fid,message]=open(obj.InputFile,'rt');
+    if fid < 0
+        disp(message)
         return
     end
 
     sect = 0;
     % Read each line from input file.
     while 1
-        tline = fgetl(EPANETIN);
+        tline = fgetl(fid);
         if ~ischar(tline),   break,   end
 
         % Get first token in the line

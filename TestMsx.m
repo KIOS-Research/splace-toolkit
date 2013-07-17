@@ -2,12 +2,12 @@
 clc; clear all; clear class;
 
 % EXAMPLE 1
-% B = Epanet('example.inp');
-% C = MsxEpanet(B,'example.msx');
+B = Epanet('example.inp');
+C = MsxEpanet(B,'example.msx');
 
 % EXAMPLE 2
-B = Epanet('Net2_Rossman2000.inp');
-C = MsxEpanet(B,'Net2_Rossman2000.msx');
+% B = Epanet('Net2_Rossman2000.inp');
+% C = MsxEpanet(B,'Net2_Rossman2000.msx');
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%                      
                            
 % Hydraulic analysis
