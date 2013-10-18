@@ -2271,7 +2271,7 @@ function [errcode,vx,vy,vertx,verty] = Getnodeinfo(obj)
     nvert = zeros(obj.CountLinks,1);
 
     % Open epanet input file
-    [fid,message]=open(obj.InputFile,'rt');
+    [fid,message]=fopen(obj.InputFile,'rt');
     if fid < 0
         disp(message)
         return
