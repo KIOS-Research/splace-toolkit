@@ -28,7 +28,7 @@ See the Licence for the specific language governing permissions and limitations 
  ## EPANET ##
 EPANET is public domain software that may be freely copied and distributed. 
 
- ## Instructions ##
+# Instructions #
 The Toolkit works with your 32-bit Matlab version, and can work with 64-bit computers by using a suitable epanet.dll
 
 1. To download, press here: https://github.com/KIOS-Research/splace-toolkit/archive/master.zip
