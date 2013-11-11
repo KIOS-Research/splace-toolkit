@@ -25,7 +25,7 @@ Unless required by applicable law or agreed to in writing, software distributed 
 
 See the Licence for the specific language governing permissions and limitations under the Licence.
 
- ## EPANET ##
+## EPANET ##
 EPANET is public domain software that may be freely copied and distributed. 
 
 # Instructions #
