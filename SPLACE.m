@@ -654,12 +654,10 @@ function SplaceTable_Callback(hObject, eventdata, handles)
             load([pwd,'\RESULTS\','h1.f'],'h1','IndexID','-mat');
             for i=1:length(IndexID)
                 C1='b'; C2='b';
-                if length(handles.B.NodeReservoirIndex)
-                    if sum(IndexID==handles.B.NodeReservoirIndex)
-                        C2='g'; C1='g';
-                    elseif sum(IndexID==handles.B.TankIndex)
-                        C2='k'; C1='k';
-                    end
+                if sum(IndexID(i)==handles.B.NodeReservoirIndex)
+                    C2='g'; C1='g';
+                elseif sum(IndexID(i)==handles.B.NodeTankIndex)
+                    C2='k'; C1='k';
                 end
                 plot(handles.B.CoordinatesXY{1}(IndexID(i)),handles.B.CoordinatesXY{2}(IndexID(i)),'o','LineWidth',2,'MarkerEdgeColor',C1,...
                 'MarkerFaceColor',C2,'MarkerSize',5);
