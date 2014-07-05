@@ -656,7 +656,7 @@ function SplaceTable_Callback(hObject, eventdata, handles)
                 C1='b'; C2='b';
                 if sum(IndexID(i)==handles.B.NodeReservoirIndex)
                     C2='g'; C1='g';
-                elseif sum(IndexID(i)==handles.B.NodeTankIndex)
+                elseif sum(IndexID(i)==handles.B.TankIndex)
                     C2='k'; C1='k';
                 end
                 plot(handles.B.CoordinatesXY{1}(IndexID(i)),handles.B.CoordinatesXY{2}(IndexID(i)),'o','LineWidth',2,'MarkerEdgeColor',C1,...
