@@ -1739,6 +1739,11 @@ function [errcode] = ENMatlabSetup(DLLname,Hname)
     %currentversion = 20012;
     % Load library
     ENDLLNAME=DLLname;
+    if strcmp(computer,'PCWIN64')
+        ENDLLNAME='epanet2x64';
+    elseif strcmp(computer,'PCWIN32')
+        ENDLLNAME='epanet2';
+    end
     ENHNAME=Hname;
     if ~libisloaded(ENDLLNAME)
         loadlibrary(ENDLLNAME,ENHNAME);

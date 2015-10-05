@@ -1,7 +1,7 @@
 %{
  Copyright 2013 KIOS Research Center for Intelligent Systems and Networks, University of Cyprus (www.kios.org.cy)
 
- Licensed under the EUPL, Version 1.1 or � as soon they will be approved by the European Commission - subsequent versions of the EUPL (the "Licence");
+ Licensed under the EUPL, Version 1.1 or ï¿½ as soon they will be approved by the European Commission - subsequent versions of the EUPL (the "Licence");
  You may not use this work except in compliance with the Licence.
  You may obtain a copy of the Licence at:
 
@@ -654,9 +654,9 @@ function SplaceTable_Callback(hObject, eventdata, handles)
             load([pwd,'\RESULTS\','h1.f'],'h1','IndexID','-mat');
             for i=1:length(IndexID)
                 C1='b'; C2='b';
-                if sum(IndexID==handles.B.NodeReservoirIndex)
+                if sum(IndexID(i)==handles.B.NodeReservoirIndex)
                     C2='g'; C1='g';
-                elseif sum(IndexID==handles.B.TankIndex)
+                elseif sum(IndexID(i)==handles.B.TankIndex)
                     C2='k'; C1='k';
                 end
                 plot(handles.B.CoordinatesXY{1}(IndexID(i)),handles.B.CoordinatesXY{2}(IndexID(i)),'o','LineWidth',2,'MarkerEdgeColor',C1,...
