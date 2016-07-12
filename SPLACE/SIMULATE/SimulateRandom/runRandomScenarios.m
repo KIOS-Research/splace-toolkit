@@ -12,13 +12,17 @@
  See the Licence for the specific language governing permissions and limitations under the Licence.
 %}
 
-function runRandomScenarios(varargin)
+function [P]=runRandomScenarios(varargin)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     if isstruct(varargin{1}) 
         file0=varargin{1}.file0;
         T=varargin{1}.T;
+        EditNofSce=varargin{1}.EditNofSce;
     else
-        file0=varargin{1};
+        B=varargin{1};
+        P=varargin{2};
+        file0=varargin{3};
+        EditNofSce=varargin{4};
         T=100; %save every 1000 scenarios
     end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -26,11 +30,11 @@ function runRandomScenarios(varargin)
 
     load([pathname,file0,'.0'],'-mat')
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    %P.ScenariosContamIndex=P.ScenariosContamIndex(1:varargin{1}.EditNofSce/size(P.ScenariosFlowIndex,1),:);
-%     P.ScenariosContamIndex=P.ScenariosContamIndex(randi(size(P.ScenariosContamIndex,1),varargin{1}.EditNofSce,1),:);
+    %P.ScenariosContamIndex=P.ScenariosContamIndex(1:EditNofSce/size(P.ScenariosFlowIndex,1),:);
+%     P.ScenariosContamIndex=P.ScenariosContamIndex(randi(size(P.ScenariosContamIndex,1),EditNofSce,1),:);
     P.ScenariosFlowIndex=P.ScenariosFlowIndex(randi(size(P.ScenariosFlowIndex,1),size(P.ScenariosFlowIndex,1),1),:);
-    P.ScenariosContamIndex=P.ScenariosContamIndex(randi(size(P.ScenariosContamIndex,1),(varargin{1}.EditNofSce)/(size(P.ScenariosFlowIndex,1)),1),:);
-    a=mod((varargin{1}.EditNofSce),(size(P.ScenariosFlowIndex,1)));
+    P.ScenariosContamIndex=P.ScenariosContamIndex(randi(size(P.ScenariosContamIndex,1),(EditNofSce)/(size(P.ScenariosFlowIndex,1)),1),:);
+    a=mod((EditNofSce),(size(P.ScenariosFlowIndex,1)));
     if a~=0
         P.ScenariosFlowIndex=[P.ScenariosFlowIndex;P.ScenariosFlowIndex(randi(size(P.ScenariosFlowIndex,1),a,1),:)];
         P.ScenariosContamIndex=[P.ScenariosContamIndex;P.ScenariosContamIndex(randi(size(P.ScenariosContamIndex,1),a,1),:)];
@@ -45,26 +49,26 @@ function runRandomScenarios(varargin)
     for i=1:size(P.ScenariosFlowIndex,1)
         B.setLinkDiameter(P.FlowParamScenarios{1}(:, P.ScenariosFlowIndex(i,1))')
         B.setLinkLength(P.FlowParamScenarios{2}(:, P.ScenariosFlowIndex(i,2))')
-        B.setLinkRoughness(P.FlowParamScenarios{3}(:, P.ScenariosFlowIndex(i,3))')
-        B.setNodeElevation(P.FlowParamScenarios{4}(:, P.ScenariosFlowIndex(i,4))')
-        B.setNodeBaseDemand(P.FlowParamScenarios{5}(:, P.ScenariosFlowIndex(i,5))')
+        B.setLinkRoughnessCoeff(P.FlowParamScenarios{3}(:, P.ScenariosFlowIndex(i,3))')
+        B.setNodeElevations(P.FlowParamScenarios{4}(:, P.ScenariosFlowIndex(i,4))')
+        B.setNodeBaseDemands({P.FlowParamScenarios{5}(:, P.ScenariosFlowIndex(i,5))'})
         if size(P.Patterns,1)==1
             B.setPatternMatrix(P.FlowParamScenarios{6}(:,P.ScenariosFlowIndex(i,6))')
         else
             B.setPatternMatrix(P.FlowParamScenarios{6}(:,:,P.ScenariosFlowIndex(i,6))')
         end
-        B.solveCompleteHydraulics
-        B.saveHydraulicFile([pathname,file0,'.h',num2str(i)])
+        B.solveCompleteHydraulics;
+        B.saveHydraulicFile([pathname,file0,'.h',num2str(i)]);
     end
     
 %     disp('Create Quality files')
     pstep=double(B.getTimePatternStep);
     B.setTimeQualityStep(pstep);
-    zeroNodes=zeros(1,B.CountNodes);
+    zeroNodes=zeros(1,B.NodeCount);
     B.setNodeInitialQuality(zeroNodes);
-    B.setLinkBulkReactionCoeff(zeros(1,B.CountLinks));
-    B.setLinkWallReactionCoeff(zeros(1,B.CountLinks));
-    for i=1:B.CountNodes
+    B.setLinkBulkReactionCoeff(zeros(1,B.LinkCount));
+    B.setLinkWallReactionCoeff(zeros(1,B.LinkCount));
+    for i=1:B.NodeCount
         B.setNodeSourceType(i,'SETPOINT');
     end
     patlen=(P.SimulationTime)*3600/pstep;
@@ -72,7 +76,8 @@ function runRandomScenarios(varargin)
     sizecontscenarios=size(P.ScenariosContamIndex,1);
 %     disp(['Hydraulic Scenarios: ', num2str(sizeflowscenarios), ', Quality Scenarios:',num2str(sizecontscenarios)])
 
-    SensingNodeIndices_NodeBaseDemands=unique([find(P.SensingNodeIndices),find(B.NodeBaseDemands)]);
+%     SensingNodeIndices_NodeBaseDemands=unique([find(P.SensingNodeIndices),find(B.NodeBaseDemands)]);
+    SensingNodeIndices_NodeBaseDemands=unique([P.SensingNodeIndices,find(B.NodeBaseDemands{1})]);
     
     l=0;
     t0=1;
@@ -140,7 +145,7 @@ function runRandomScenarios(varargin)
         clear C;
     catch err
     end
-    P.newTotalofScenarios=varargin{1}.EditNofSce;
+    P.newTotalofScenarios=EditNofSce;
     save([pathname,file0,'.0'],'P','B','-mat');
     save([pathname,file0,'.c0'],'D','T','l','t0', '-mat');    
     SimulateMethod='random';

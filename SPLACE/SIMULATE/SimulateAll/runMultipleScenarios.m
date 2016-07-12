@@ -32,9 +32,9 @@ function runMultipleScenarios(varargin)
     for i=1:size(P.ScenariosFlowIndex,1)
         B.setLinkDiameter(P.FlowParamScenarios{1}(:, P.ScenariosFlowIndex(i,1))')
         B.setLinkLength(P.FlowParamScenarios{2}(:, P.ScenariosFlowIndex(i,2))')
-        B.setLinkRoughness(P.FlowParamScenarios{3}(:, P.ScenariosFlowIndex(i,3))')
-        B.setNodeElevation(P.FlowParamScenarios{4}(:, P.ScenariosFlowIndex(i,4))')
-        B.setNodeBaseDemand(P.FlowParamScenarios{5}(:, P.ScenariosFlowIndex(i,5))')
+        B.setLinkRoughnessCoeff(P.FlowParamScenarios{3}(:, P.ScenariosFlowIndex(i,3))')
+        B.setNodeElevations(P.FlowParamScenarios{4}(:, P.ScenariosFlowIndex(i,4))')
+        B.setNodeBaseDemands({P.FlowParamScenarios{5}(:, P.ScenariosFlowIndex(i,5))'})
         if size(P.Patterns,1)==1
             B.setPatternMatrix(P.FlowParamScenarios{6}(:,P.ScenariosFlowIndex(i,6))')
         else
@@ -47,18 +47,18 @@ function runMultipleScenarios(varargin)
 %     disp('Create Quality files')
     pstep=double(B.getTimePatternStep);
     B.setTimeQualityStep(pstep);
-    zeroNodes=zeros(1,B.CountNodes);
+    zeroNodes=zeros(1,B.NodeCount);
     B.setNodeInitialQuality(zeroNodes);
-    B.setLinkBulkReactionCoeff(zeros(1,B.CountLinks));
-    B.setLinkWallReactionCoeff(zeros(1,B.CountLinks));
-    for i=1:B.CountNodes
+    B.setLinkBulkReactionCoeff(zeros(1,B.LinkCount));
+    B.setLinkWallReactionCoeff(zeros(1,B.LinkCount));
+    for i=1:B.NodeCount
         B.setNodeSourceType(i,'SETPOINT');
     end
     patlen=(P.SimulationTime)*3600/pstep;
     sizeflowscenarios=size(P.ScenariosFlowIndex,1);
     sizecontscenarios=size(P.ScenariosContamIndex,1);
 %     disp(['Hydraulic Scenarios: ', num2str(sizeflowscenarios), ', Quality Scenarios:',num2str(sizecontscenarios)])
-    SensingNodeIndices_NodeBaseDemands=unique([find(P.SensingNodeIndices),find(B.NodeBaseDemands)]);
+    SensingNodeIndices_NodeBaseDemands=unique([P.SensingNodeIndices,find(B.NodeBaseDemands{1})]);
    
     l=0;
     t0=1;

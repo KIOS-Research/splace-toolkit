@@ -3,7 +3,7 @@ function progressbar(handles,nload)
     set(handles.text_progress,'String',strcat(num2str(0),' %'),'FontSize',8);
     progpatch = patch(...
             'XData',            [0 0 0 0],...
-            'YData',            [0 0 1 1]);%patch
+            'YData',            [0 0 0 0]);%patch
     percentdone = 0;
     set(handles.text_progress,'String',strcat(num2str(percentdone),' %'),'FontSize',8);
     set(progpatch,'FaceColor',handles.color); 
@@ -22,7 +22,10 @@ function progressbar(handles,nload)
     % Force redraw to show changes
     drawnow
 end
-% 
-% x = [100 100 0 0];
-% y = [100 100 100 100];
-% patch(x,y,'red')
+
+v = [10 10; 10 30; 10 1; 90 10];
+patch('Vertices',v,'FaceColor',handles.color)            
+
+x = [0 0 0 0];
+y = [1 1 1 1];
+patch(x,y,'red')

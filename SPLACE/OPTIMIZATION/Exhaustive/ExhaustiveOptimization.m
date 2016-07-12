@@ -20,7 +20,9 @@ function ExhaustiveOptimization(varargin)
         load([pwd,'\RESULTS\','pathname.File'],'pathname','-mat');
     else
         file0=varargin{1};
-        numberOfSensors=1:5;
+        numberOfSensors=varargin{2};%         numberOfSensors=1:5;
+%         B=varargin{3};%         numberOfSensors=1:5;
+%         P=varargin{4};%         numberOfSensors=1:5;
         pathname=[pwd,'\RESULTS\'];
     end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -39,13 +41,13 @@ function ExhaustiveOptimization(varargin)
         [v.figure1,v.axes2,v.text_progress]=SolveLoadGui;
         v.str='Solve with exhaustive method..';
         for j=numberOfSensors
-            total(j) = nchoosek(length(1:B.CountNodes),j);
+            total(j) = nchoosek(length(1:B.NodeCount),j);
         end
         total=sum(total);pp=1;
     end
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     for j=numberOfSensors
-        numberCombinations=nchoosek(length(1:B.CountNodes),j);
+        numberCombinations=nchoosek(length(1:B.NodeCount),j);
         population=combnk(find(P.SensingNodeIndices),j);
         score=inf*ones(size(population,1),2); 
         for i=1:size(population,1)
@@ -65,8 +67,8 @@ function ExhaustiveOptimization(varargin)
 
         %mean2=0;
         %max2=0;
-        %numberCombinations = nchoosek(length(1:B.CountNodes),j);
-        %X=combnk(1:B.CountNodes,j);
+        %numberCombinations = nchoosek(length(1:B.NodeCount),j);
+        %X=combnk(1:B.NodeCount,j);
         %tic
         %for i=1:size(X,1)
             % THIS TAKES SOME TIME TO CALCULATE for each scenario
@@ -89,7 +91,7 @@ function ExhaustiveOptimization(varargin)
         sols=find(PS{j}==1);
         Y.xIndex{k}=population(sols,:);
         for i=1:size(Y.xIndex{k},1)
-            x=logical(zeros(1,B.CountNodes));
+            x=logical(zeros(1,B.NodeCount));
             x(Y.xIndex{k}(i,:))=1;
             Y.x=[Y.x; x];
         end

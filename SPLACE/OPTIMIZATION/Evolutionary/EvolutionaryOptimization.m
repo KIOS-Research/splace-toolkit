@@ -24,7 +24,7 @@ function EvolutionaryOptimization(varargin)
         load([pwd,'\RESULTS\','pathname.File'],'pathname','-mat');
     else
         file0=varargin{1};
-        %numberOfSensors=1:B.CountNodes; 
+        %numberOfSensors=1:B.NodeCount; 
 %         solutionMethod=0; % 0 is exhaustive, 1 is evolutionary based
         PopulationSize_Data=1000;
         ParetoFraction_Data=0.7;
@@ -53,7 +53,7 @@ function EvolutionaryOptimization(varargin)
 
 %             Y.xIndex{u}=xIdx;
             for j=1:size(xIdx,1)
-                zer=logical(zeros(1,B.CountNodes));
+                zer=logical(zeros(1,B.NodeCount));
                 zer(xIdx(j,:))=1;
                 Y.x(size(Y.x,1)+1,:)=zer;
                 Y.F(size(Y.F,1)+1,:)=[i,fval(j,:)];

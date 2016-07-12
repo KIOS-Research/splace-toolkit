@@ -19,7 +19,9 @@ function ComputeImpactMatrices(varargin)
         IM{1}.SensorThreshold=varargin{1}.SensorThreshold1;
         load([pwd,'\RESULTS\','pathname.File'],'pathname','-mat');
     else
-        file0=varargin{1};
+%         B=varargin{1}; 
+%         P=varargin{2}; 
+        file0=varargin{1}; 
         %contaminanted water consumption volume
         IM{1}.SensorThreshold=0.3; %mg/L 
         pathname=[pwd,'\RESULTS\'];
@@ -39,12 +41,12 @@ function ComputeImpactMatrices(varargin)
     end
     disp('Compute Impact Matrix')
     Dt=double(B.TimeHydraulicStep)/60; % time step in minutes
-    T=inf*ones(sizeflowscenarios*sizecontscenarios,B.CountNodes);
-    W{1}=inf*ones(totalscenarios,B.CountNodes);
-    %W{2}=inf*ones(sizeflowscenarios*sizecontscenarios,B.CountNodes);
+    T=inf*ones(sizeflowscenarios*sizecontscenarios,B.NodeCount);
+    W{1}=inf*ones(totalscenarios,B.NodeCount);
+    %W{2}=inf*ones(sizeflowscenarios*sizecontscenarios,B.NodeCount);
     for i=1:length(D)
         demand{i}=zeros(size(D{1}.Demand,1),size(D{1}.Demand,2));
-        demand{i}(:,B.NodeJunctionIndex)=D{i}.Demand(:,B.NodeJunctionIndex);
+        demand{i}=D{i}.Demand(:,B.NodeJunctionIndex);
         demand{i}(find(demand{i}<0))=0;
     end
     
@@ -58,7 +60,7 @@ function ComputeImpactMatrices(varargin)
             end
             
             for k=1:size(C,2)
-                c=C{k}.Quality;             
+                c=C{k}.QualitySensingNodes;             
                 l=l+1;
                 %Contaminated Water Consumption Volume
                 c1=c;
@@ -68,7 +70,7 @@ function ComputeImpactMatrices(varargin)
                 cwv=c1.*Dt.*demand{d(k)}; %D{d(k)}.Demand.*Dt;
                 for j=detectionNodes
                     [a tmp]=max(c1(:,j));
-                    W{1}(l,j)=sum(sum(cwv(1:tmp,1:B.CountNodes)));
+                    W{1}(l,j)=sum(sum(cwv(1:tmp,1:B.NodeJunctionCount)));%B.NodeCount
                 end
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
                 if isstruct(varargin{1}) 
@@ -81,12 +83,12 @@ function ComputeImpactMatrices(varargin)
                 end 
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%  
                 try
-                    W{1}(l,find(W{1}(l,:)==inf))=sum(sum(cwv(1:size(cwv,1),1:B.CountNodes))); 
+                    W{1}(l,find(W{1}(l,:)==inf))=sum(sum(cwv(1:size(cwv,1),1:B.NodeJunctionCount))); 
                 catch err
                 end
             end
             clear C;
-            W{1}(:,find(P.SensingNodeIndices==0))=0;
+            W{1}(:,P.SensingNodeIndices==0)=0;
             save([pathname,file0,'.w'],'W', 'IM', '-mat');
         end
     end

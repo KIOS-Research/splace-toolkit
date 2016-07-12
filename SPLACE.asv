@@ -64,7 +64,7 @@ function SPLACE_OpeningFcn(hObject, eventdata, handles, varargin)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 % varargin   command line arguments to SPLACE (see VARARGIN)
-if ~isdeployed
+if isdeployed
     path(path,genpath(pwd));
 end
 
@@ -83,6 +83,10 @@ end
     
 function opening(hObject, eventdata, handles)
         
+%     a=imread('Splace.png');
+%     set(handles.frameOfNet,'Visible','on');
+%     set(handles.frameOfNet,'CData',a);
+    
     set(handles.figure1,'name','S-Place: Quality Sensor Placement in Water Distribution Systems');
     ScreenSize=get(0,'ScreenSize');
 
@@ -153,12 +157,10 @@ function opening(hObject, eventdata, handles)
     end
     handles.dataplots=[];
     handles.file=[];
+    path(path,genpath(pwd)); % Set current folder and subfolders in PATH
     handles.previousg=axes('Parent',handles.axes1);
-    if eventdata
-        handles.logo=imshow('\HELP\white.png','Parent',handles.previousg);
-    else
-        handles.logo=imshow('\HELP\splace2.png','Parent',handles.previousg);
-    end
+    handles.logo=imshow('\HELP\splace2.png','Parent',handles.previousg);
+
     set(handles.SaveNetwork,'visible','off');
     set(handles.Zoom,'visible','off');
     set(handles.pan,'visible','off');
@@ -232,12 +234,12 @@ function LoadInputFile_Callback(hObject, eventdata, handles)
         save([pwd,'\RESULTS\','pathname.File'],'pathname','-mat');
         warning on;
         if isempty(B.errcode)% || isempty(B.NodeCount)
-            opening(hObject, 1, handles);
             s = [['Could not open network "',inputfile,'".'] {'Please insert the correct filename(*.inp).'}];
             set(handles.LoadText,'Value',length(s));
             set(handles.LoadText,'String',s);
-            set(handles.LoadInputFile,'str','Load Input File','backg',col);          
-            return;
+            set(handles.LoadInputFile,'str','Load Input File','backg',col);
+Close_Callback(hObject, eventdata, handles)
+return;
         end
 
 %         set(handles.LoadText,'String',which(inputfile));

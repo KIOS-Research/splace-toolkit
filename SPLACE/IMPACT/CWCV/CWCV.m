@@ -58,13 +58,13 @@ function CWCV_OpeningFcn(hObject, eventdata, handles, varargin)
         if ~isempty([handles.file0,'.0']) 
             load([pathname,handles.file0,'.0'],'-mat');
         else
-            B.InputFile=handles.B.InputFile;
+            B.inputfile=handles.B.inputfile;
         end
     else
-        B.InputFile=[];
+        B.inputfile=[];
     end
 
-    if ~strcmp(handles.B.InputFile,B.InputFile)
+    if ~strcmp(handles.B.inputfile,B.inputfile)
         set(handles.start,'enable','off');
         set(handles.SensorThreshold,'enable','off');
         set(handles.FileText,'String','')
@@ -142,7 +142,7 @@ function load_Callback(hObject, eventdata, handles)
         save([pwd,'\RESULTS\','File0.File'],'file0','-mat');
         load([pathname,file0,'.0'],'-mat');
         handles.file0=file0;
-        if ~strcmp(handles.B.InputFile,B.InputFile) %|| ~exist([handles.file0,'.w'],'file')
+        if ~strcmp(handles.B.inputfile,B.inputfile) %|| ~exist([handles.file0,'.w'],'file')
             set(handles.start,'enable','off');
             set(handles.SensorThreshold,'enable','off');
             load([pwd,'\RESULTS\','ComWind.messsages'],'msg','-mat');

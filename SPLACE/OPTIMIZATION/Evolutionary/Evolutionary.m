@@ -89,13 +89,13 @@ function Evolutionary_OpeningFcn(hObject, eventdata, handles, varargin)
         if ~isempty([handles.file0,'.0']) 
             load([pathname,handles.file0,'.0'],'-mat');
         else
-            B.InputFile=handles.B.InputFile;
+            B.inputfile=handles.B.inputfile;
         end
     else
-        B.InputFile=[];
+        B.inputfile=[];
     end
 
-    if ~strcmp(handles.B.InputFile,B.InputFile)
+    if ~strcmp(handles.B.inputfile,B.inputfile)
         set(handles.FileText0,'String','')
     else
         set(handles.FileText0,'String',[handles.file0,'.0'])
@@ -272,7 +272,7 @@ function Solve_Callback(hObject, eventdata, handles)
     set(handles.LoadText,'String',msg);
     set(handles.LoadText,'Value',length(msg)); 
     
-    if sum(str2num(handles.pp.numberOfSensors)>handles.B.CountNodes)>0
+    if sum(str2num(handles.pp.numberOfSensors)>handles.B.NodeCount)>0
         msg=[msg;{'>>Give number of sensors.'}];
         set(handles.LoadText,'String',msg);
         set(handles.LoadText,'Value',length(msg)); 
@@ -312,11 +312,11 @@ function Solve_Callback(hObject, eventdata, handles)
             r=Y.F(k,:);k=k+1;
             f1=r(2);
             f2=r(3);
-            if size(ss)>1
-                ss1=ss(pp,:);
-            else
-                ss1=ss(:,pp);
-            end
+%             if size(ss)>1
+            ss1=ss(pp,:);
+%             else
+%                 ss1=ss(:,pp);
+%             end
             Sensors=handles.B.NodeNameID{ss1};
             SensorsSS= [num2str(Sensors),''];
             if length(ss1)>1
@@ -325,8 +325,9 @@ function Solve_Callback(hObject, eventdata, handles)
                 end
             end
             w=[w;{['mean=',num2str(sprintf('%10.2f',f1)),'       max=',num2str(sprintf('%10.2f',f2)),'       NodesID: ',SensorsSS]}];
+            warning off;
             set(handles.SplaceTable,'Value',length(w));
-            set(handles.SplaceTable,'String',w);
+            set(handles.SplaceTable,'String',w);warning on;
         else
             u=u+1;
             pp=0;
@@ -368,7 +369,7 @@ function [errorCode,pp] = CheckForError(hObject,handles)
         return
     end
 
-    if ~length(pp.numberOfSensors) || sum(pp.numberOfSensors<0) || sum((pp.numberOfSensors)>handles.B.CountNodes)>0   
+    if ~length(pp.numberOfSensors) || sum(pp.numberOfSensors<0) || sum((pp.numberOfSensors)>handles.B.NodeCount)>0   
     msgbox('     Give Number of Sensors', 'Error', 'modal')
     errorCode=1;
     return
@@ -441,7 +442,7 @@ function LoadScenarios_Callback(hObject, eventdata, handles)
     if ~isempty((file0)) 
         load([pathname,file0,'.0'],'-mat');clc;
         handles.file0=file0;
-        if ~strcmp(handles.B.InputFile,B.InputFile)
+        if ~strcmp(handles.B.inputfile,B.inputfile)
             set(handles.Solve,'enable','off');
             set(handles.LoadImpactMatrix,'enable','off');
             load([pwd,'\RESULTS\','ComWind.messsages'],'msg','-mat');

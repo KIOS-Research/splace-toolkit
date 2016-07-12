@@ -12,7 +12,7 @@
  See the Licence for the specific language governing permissions and limitations under the Licence.
 %}
 
-function P=gridmethod(varargin)
+function [P,B]=gridmethod(varargin)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     if isstruct(varargin{1})
         P=GetGuiParameters(varargin{1});
@@ -65,13 +65,9 @@ function P=gridmethod(varargin)
     P.ScenariosFlowIndex=cartesianProduct(FlowScenarioSets);
     P.ScenariosContamIndex=cartesianProduct(ContamScenarioSets);
     P.TotalScenarios=size(P.ScenariosFlowIndex,1)*size(P.ScenariosContamIndex,1);        
-    
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     if ~isstruct(varargin{1})
         file0='file0';
         save([pwd,'\RESULTS\',file0,'.0'],'P','B','-mat');
     end
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    
 end
     

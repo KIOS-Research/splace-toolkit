@@ -40,19 +40,19 @@ function P=DefaultParameters(varargin)
     P.SourcesMaxNumber=1; % maximum number of simultaneous sources (including 1,2..)
     P.SourcesInjectionTimes=[0 24]; %from...to in hours
     %P.SourcesInjectionTimes=[4 5]; %from...to in hours
-    P.SourcesNodeIndices=1:B.CountNodes;
-    P.SensingNodeIndices=1:B.CountNodes;
+    P.SourcesNodeIndices=1:B.NodeCount;
+    P.SensingNodeIndices=1:B.NodeCount;
     %P.SourcesNodeIndices=[3 10];
     %P.SourcesNodeIndices=89;
 
     %AFFECTING FLOWS
     P.Diameters=B.getLinkDiameter;
     P.Lengths=B.getLinkLength;
-    P.Roughness=B.getLinkRoughness;
-    P.Elevation=B.getNodeElevation;
-    P.BaseDemand=B.getNodeBaseDemand;
+    P.Roughness=B.getLinkRoughnessCoeff;
+    P.Elevation=B.getNodeElevations;
+    P.BaseDemand=B.getNodeBaseDemands;
     %P.SourcesNodeIndicesNonZero=P.BaseDemand~=0;
-    P.NodesNonZeroDemands=find(P.BaseDemand>0);
+    P.NodesNonZeroDemands=find(P.BaseDemand{1}>0);
     P.Patterns=B.getPattern;
 
     P.FlowParameters={'Diameters', 'Lengths','Roughness',...

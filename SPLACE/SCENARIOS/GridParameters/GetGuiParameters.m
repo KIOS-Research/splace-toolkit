@@ -44,16 +44,18 @@ function P=GetGuiParameters(varargin)
     P.SourcesInjectionTimes(2)=str2num(get(varargin{1}.stop,'String'));
 
     % Reslease Location
-    P.SourcesNodeIndices(1:B.CountNodes)=0;
-    for i=1:varargin{1}.B.CountNodes
+%     P.SourcesNodeIndices=find(varargin{1}.release);
+    P.SourcesNodeIndices(1:B.NodeCount)=0;
+    for i=1:varargin{1}.B.NodeCount
         P.SourcesNodeIndices(i)=varargin{1}.release(i);
         if P.SourcesNodeIndices(i)~=0
             P.SourcesNodeIndices(i)=i;%u=u+1;
         end
     end
     % Sensing Location
-    P.SensingNodeIndices(1:B.CountNodes)=0;
-    for i=1:varargin{1}.B.CountNodes
+%     P.SensingNodeIndices=find(varargin{1}.sensing);
+    P.SensingNodeIndices(1:B.NodeCount)=0;
+    for i=1:varargin{1}.B.NodeCount
         P.SensingNodeIndices(i)=varargin{1}.sensing(i);
         if P.SensingNodeIndices(i)~=0
             P.SensingNodeIndices(i)=i;%u=u+1;
