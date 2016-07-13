@@ -14,20 +14,17 @@
 
 %% S-PLACE
 function Y=TestSplace
-    path(path,genpath(pwd));
-
-    %delete filename.*
-    if libisloaded('epanet2') 
-        unloadlibrary('epanet2')
-    end
+    addpath(genpath(pwd));
     clear
     clc
     file0='file0'; % in gidmethod
-    B=Epanet('Net2.inp');
+    B=epanet('NETWORKS/Net1_Rossman2000.inp');
     P=gridmethod(B);
     runMultipleScenarios(file0);
     ComputeImpactMatrices(file0);
-    ExhaustiveOptimization(file0); %EvolutionaryOptimization
+    
+    numberofSensors=3;
+    ExhaustiveOptimization(file0,numberofSensors); %EvolutionaryOptimization
     load('file0.y0','-mat');
     
     B.unload

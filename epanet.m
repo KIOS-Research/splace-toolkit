@@ -605,17 +605,17 @@ classdef epanet <handle
                 obj.LinkPumpTypeCode = obj.getLinkPumpTypeCode;
                 obj.LinkPumpType = obj.getLinkPumpType;
 %                 obj.CurvesInfo = obj.getCurvesInfo; % New version dev2.1
-                %Get data from raw file (for information which cannot be
-                %accessed by the epanet library)
-                value=obj.getNodeCoordinates;
-                %Get coordinates
-                obj.NodeCoordinates{1} = value{1};
-                obj.NodeCoordinates{2} = value{2};
-                obj.NodeCoordinates{3} = value{3};
-                obj.NodeCoordinates{4} = value{4};
             catch e
             end
-            
+            %Get data from raw file (for information which cannot be
+            %accessed by the epanet library)
+            value=obj.getNodeCoordinates;
+            %Get coordinates
+            obj.NodeCoordinates{1} = value{1};
+            obj.NodeCoordinates{2} = value{2};
+            obj.NodeCoordinates{3} = value{3};
+            obj.NodeCoordinates{4} = value{4};
+       
             %     US Customary - SI metric
             if find(strcmp(obj.LinkFlowUnits, obj.TYPEUNITS))<6
                 obj.UScustomary=1;
@@ -2086,17 +2086,17 @@ classdef epanet <handle
         end
         function setNodeBaseDemands(obj, value)
             %New version dev2.1
-            chckfunctions=libfunctions(obj.libepanet);
-            if sum(strcmp(chckfunctions,'ENsetbasedemand'))
-                NodeNumDemandC=obj.getNodeNumDemandCategories;
-                for u=1:obj.getNodeJunctionCount
-                    [obj.errcode] = ENsetbasedemand(u, NodeNumDemandC(u), value{NodeNumDemandC(u)}(u),obj.libepanet);
-                end
-            else %version epanet20012
+%             chckfunctions=libfunctions(obj.libepanet);
+%             if sum(strcmp(chckfunctions,'ENsetbasedemand'))
+%                 NodeNumDemandC=obj.getNodeNumDemandCategories;
+%                 for u=1:obj.getNodeJunctionCount
+%                     [obj.errcode] = ENsetbasedemand(u, NodeNumDemandC(u), value{NodeNumDemandC(u)}(u),obj.libepanet);
+%                 end
+%             else %version epanet20012
                 for i=1:length(value)
                     [obj.errcode] = ENsetnodevalue(i, 1, value(i),obj.libepanet);
                 end
-            end
+%             end
         end
         function setNodeCoordinates(obj, value)
             for i=1:length(value)

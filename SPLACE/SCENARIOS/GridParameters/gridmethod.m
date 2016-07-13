@@ -62,9 +62,12 @@ function [P,B]=gridmethod(varargin)
     P.SourceTimes=min(find(pts/3600*(0:(psim-(pts/3600)))>=P.SourcesInjectionTimes(1))):max(find(pts/3600*(0:(psim-(pts/3600)))<=P.SourcesInjectionTimes(2)));
     ContamScenarioSets{size(ContamScenarioSets,2)+1}=1:length(P.SourceTimes);
     
+    P.FlowScenarioSets=FlowScenarioSets;
+    P.ContamScenarioSets=ContamScenarioSets;
     P.ScenariosFlowIndex=cartesianProduct(FlowScenarioSets);
     P.ScenariosContamIndex=cartesianProduct(ContamScenarioSets);
     P.TotalScenarios=size(P.ScenariosFlowIndex,1)*size(P.ScenariosContamIndex,1);        
+    P.newTotalofScenarios=P.TotalScenarios;
     if ~isstruct(varargin{1})
         file0='file0';
         save([pwd,'\RESULTS\',file0,'.0'],'P','B','-mat');

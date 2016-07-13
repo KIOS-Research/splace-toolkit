@@ -50,9 +50,9 @@ function P=DefaultParameters(varargin)
     P.Lengths=B.getLinkLength;
     P.Roughness=B.getLinkRoughnessCoeff;
     P.Elevation=B.getNodeElevations;
-    P.BaseDemand=B.getNodeBaseDemands;
+    P.BaseDemand=B.getNodeBaseDemands{1};
     %P.SourcesNodeIndicesNonZero=P.BaseDemand~=0;
-    P.NodesNonZeroDemands=find(P.BaseDemand{1}>0);
+    P.NodesNonZeroDemands=find(P.BaseDemand>0);
     P.Patterns=B.getPattern;
 
     P.FlowParameters={'Diameters', 'Lengths','Roughness',...

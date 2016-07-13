@@ -465,30 +465,35 @@ function ComputeImpactMatrix_Callback(hObject, eventdata, handles)
 
     if exist('File0.File','file')==2 
         load([pwd,'\RESULTS\','File0.File'],'-mat');
-        [path, name, ext] = fileparts(file0);
+        if exist([pathname,file0,'.0'],'file')==2
+            [path, name, ext] = fileparts(file0);
+        else
+            ext=1;
+        end
+        
         if length(ext)==0
             file0=[file0,'.0'];
-        end
-        if exist([pathname,file0],'file')==2 && exist([pathname,file0(1:end-1),'c0'],'file')==2
-            if ~isempty(file0) 
-                load([pathname,file0],'-mat');
+            if exist([pathname,file0],'file')==2 && exist([pathname,file0(1:end-1),'c0'],'file')==2
+                if ~isempty(file0) 
+                    load([pathname,file0],'-mat');
+                else
+                    B.inputfile=handles.B.inputfile;
+                end
             else
-                B.inputfile=handles.B.inputfile;
+                B.inputfile=[];
+                load([pwd,'\RESULTS\','ComWind.messsages'],'msg','-mat');
+                set(handles.LoadText,'Value',1);
+                msg=[msg;{'>>First must be run Simulate Scenarios.'}];
+                set(handles.LoadText,'String',msg);
+                set(handles.LoadText,'Value',length(msg)); 
+                save([pwd,'\RESULTS\','ComWind.messsages'],'msg','-mat');
+                set(handles.runMultipleScenarios,'enable','on');
+                set(handles.LoadInputFile,'enable','on');
+                set(handles.CreateScenarios,'enable','on');
+                set(handles.SolveSensorPlacement,'enable','on');
+                set(handles.Exit,'enable','on');
+                return
             end
-        else
-            B.inputfile=[];
-            load([pwd,'\RESULTS\','ComWind.messsages'],'msg','-mat');
-            set(handles.LoadText,'Value',1);
-            msg=[msg;{'>>First must be run Simulate Scenarios.'}];
-            set(handles.LoadText,'String',msg);
-            set(handles.LoadText,'Value',length(msg)); 
-            save([pwd,'\RESULTS\','ComWind.messsages'],'msg','-mat');
-            set(handles.runMultipleScenarios,'enable','on');
-            set(handles.LoadInputFile,'enable','on');
-            set(handles.CreateScenarios,'enable','on');
-            set(handles.SolveSensorPlacement,'enable','on');
-            set(handles.Exit,'enable','on');
-            return
         end
 %         if ~strcmp(handles.B.inputfile,B.inputfile)             
 %             load([pwd,'\RESULTS\','ComWind.messsages'],'msg','-mat');
@@ -727,8 +732,8 @@ function SplaceTable_Callback(hObject, eventdata, handles)
 %         SensorsNodesID=tline(6:end);
         for i=1:length(SensorsNodesID)
             IndexID(i)= find(strcmpi(handles.B.NodeNameID,SensorsNodesID(i)));
-            x{i}=handles.B.NodeCoordinates{1}(find(strcmpi(handles.B.NodeNameID,SensorsNodesID(i))));
-            y{i}=handles.B.NodeCoordinates{2}(find(strcmpi(handles.B.NodeNameID,SensorsNodesID(i))));
+            x{i}=handles.B.NodeCoordinates{1}(IndexID(i));
+            y{i}=handles.B.NodeCoordinates{2}(IndexID(i));
         end
             
         t=1;

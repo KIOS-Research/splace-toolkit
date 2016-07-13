@@ -51,7 +51,7 @@ function [P]=runRandomScenarios(varargin)
         B.setLinkLength(P.FlowParamScenarios{2}(:, P.ScenariosFlowIndex(i,2))')
         B.setLinkRoughnessCoeff(P.FlowParamScenarios{3}(:, P.ScenariosFlowIndex(i,3))')
         B.setNodeElevations(P.FlowParamScenarios{4}(:, P.ScenariosFlowIndex(i,4))')
-        B.setNodeBaseDemands({P.FlowParamScenarios{5}(:, P.ScenariosFlowIndex(i,5))'})
+        B.setNodeBaseDemands(P.FlowParamScenarios{5}(:, P.ScenariosFlowIndex(i,5))')
         if size(P.Patterns,1)==1
             B.setPatternMatrix(P.FlowParamScenarios{6}(:,P.ScenariosFlowIndex(i,6))')
         else
@@ -77,7 +77,7 @@ function [P]=runRandomScenarios(varargin)
 %     disp(['Hydraulic Scenarios: ', num2str(sizeflowscenarios), ', Quality Scenarios:',num2str(sizecontscenarios)])
 
 %     SensingNodeIndices_NodeBaseDemands=unique([find(P.SensingNodeIndices),find(B.NodeBaseDemands)]);
-    SensingNodeIndices_NodeBaseDemands=unique([P.SensingNodeIndices,find(B.NodeBaseDemands{1})]);
+    SensingNodeIndices_NodeBaseDemands=unique([find(P.SensingNodeIndices),find(B.NodeBaseDemands{1})]);
     
     l=0;
     t0=1;
@@ -90,7 +90,7 @@ function [P]=runRandomScenarios(varargin)
             disp(['Hydraulic Scenario ',num2str(l)])
             st2=0;
             avtime=inf;
-            D{l}=B.getComputedQualityTimeSeries('time','demand',SensingNodeIndices_NodeBaseDemands);
+            D{l}=B.getComputedQualityTimeSeries('time','demandSensingNodes',SensingNodeIndices_NodeBaseDemands);
             i=1;
         end
         
@@ -105,7 +105,7 @@ function [P]=runRandomScenarios(varargin)
         end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%         disp(i)
+        disp(['Scenario: ',num2str(i)])
         t1=tic;
         tmppat=zeros(1,patlen);
         tmpstartstep=P.SourceTimes(P.ScenariosContamIndex(i,4));

@@ -45,8 +45,8 @@ function ComputeImpactMatrices(varargin)
     W{1}=inf*ones(totalscenarios,B.NodeCount);
     %W{2}=inf*ones(sizeflowscenarios*sizecontscenarios,B.NodeCount);
     for i=1:length(D)
-        demand{i}=zeros(size(D{1}.Demand,1),size(D{1}.Demand,2));
-        demand{i}=D{i}.Demand(:,B.NodeJunctionIndex);
+        demand{i}=zeros(size(D{1}.DemandSensingNodes,1),B.NodeCount);
+        demand{i}(:,find(P.SensingNodeIndices))=D{i}.DemandSensingNodes;
         demand{i}(find(demand{i}<0))=0;
     end
     
@@ -60,10 +60,11 @@ function ComputeImpactMatrices(varargin)
             end
             
             for k=1:size(C,2)
-                c=C{k}.QualitySensingNodes;             
+                c=C{k}.QualitySensingNodes;   
+                c1=zeros(size(C{k}.QualitySensingNodes,1),B.NodeCount);
                 l=l+1;
                 %Contaminated Water Consumption Volume
-                c1=c;
+                c1(:,find(P.SensingNodeIndices))=c;
                 c1(find(c1<=IM{1}.SensorThreshold))=0;
                 c1(find(c1>IM{1}.SensorThreshold))=1;
                 detectionNodes=find(sum(c1));
