@@ -155,9 +155,9 @@ function opening(hObject, eventdata, handles)
     handles.file=[];
     handles.previousg=axes('Parent',handles.axes1);
     if eventdata
-        handles.logo=imshow([pwd, '\HELP\white.png'],'Parent',handles.previousg);
+        handles.logo=imshow([pwd,'\HELP\white.png'],'Parent',handles.previousg);
     else
-        handles.logo=imshow([pwd, '\HELP\splace2.png'],'Parent',handles.previousg);
+        handles.logo=imshow([pwd,'\HELP\splace2.png'],'Parent',handles.previousg);
     end
     set(handles.SaveNetwork,'visible','off');
     set(handles.Zoom,'visible','off');
