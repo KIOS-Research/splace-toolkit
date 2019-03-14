@@ -18,9 +18,17 @@ The `Sensor Placement (S-PLACE) Toolkit' is used for computing at which location
 
 ## How to cite
 
-Mathematical Framework
-* Eliades, D., Polycarpou, M., 2010. A fault diagnosis and security framework for water systems. IEEE Transactions on Control Systems Technology
-18, 1254�1265. [ref](http://ieeexplore.ieee.org/xpl/articleDetails.jsp?tp=&arnumber=5350461)
+@proceedings{eliades_demetrios_g_2014_1252756,
+  title        = {{Sensor Placement in Water Distribution Systems 
+                   Using the S-PLACE Toolkit}},
+  year         = 2014,
+  publisher    = {Zenodo},
+  month        = apr,
+  doi          = {10.1016/j.proeng.2014.02.066},
+  url          = {https://doi.org/10.1016/j.proeng.2014.02.066}
+}
+
+* Eliades, D. G., Kyriakou, M., and Polycarpou, M. M. (2014). Sensor placement in water distribution systems using the S-PLACE Toolkit. Proc12th International Conference on Computing and Control for the Water Industry, CCWI2013, Procedia Engineering, Elsevier, 70, pp. 602-611. (https://doi.org/10.1016/j.proeng.2014.02.066)
 
 &uparrow; [Back to top](#table-of-contents)
 
@@ -34,9 +42,11 @@ Mathematical Framework
 ## Licenses
 
 S-PLACE Toolkit
+
+
 Copyright 2013 KIOS Research Center for Intelligent Systems and Networks, University of Cyprus (www.kios.org.cy)
 
-Licensed under the EUPL, Version 1.1 or � as soon they will be approved by the European Commission - subsequent versions of the EUPL (the "Licence");
+Licensed under the EUPL, Version 1.1 or - as soon they will be approved by the European Commission - subsequent versions of the EUPL (the "Licence");
 - You may not use this work except in compliance with the Licence.
 - You may obtain a copy of the Licence at: (http://ec.europa.eu/idabc/eupl)
 
