@@ -59,13 +59,13 @@ function SimulateAll_OpeningFcn(hObject, eventdata, handles, varargin)
         if ~isempty([handles.file0,'.0']) 
             load([pathname,handles.file0,'.0'],'-mat');
         else
-            B.inputfile=handles.B.inputfile;
+            B.InputFile=handles.B.InputFile;
         end
     else
-        B.inputfile=[];
+        B.InputFile=[];
     end
 
-    if ~strcmp(handles.B.inputfile,B.inputfile)
+    if ~strcmp(handles.B.InputFile,B.InputFile)
         set(handles.start,'enable','off');
         set(handles.SaveEveryScenarios,'enable','off');
         %set(handles.EditNumberOfScenarios,'enable','off');
@@ -121,7 +121,7 @@ function start_Callback(hObject, eventdata, handles)
     if libisloaded('epanet2')
         unloadlibrary('epanet2');
     end
-    handles.B=epanet(handles.B.inputfile);clc;
+    handles.B=epanet(handles.B.InputFile);clc;
     pause(0.1);
     close;
 
@@ -152,7 +152,7 @@ function load_Callback(hObject, eventdata, handles)
         save([pwd,'\RESULTS\','File0.File'],'file0','-mat');
         load([pathname,file0,'.0'],'-mat');
         handles.file0=file0;
-        if ~strcmp(handles.B.inputfile,B.inputfile)
+        if ~strcmp(handles.B.InputFile,B.InputFile)
             set(handles.start,'enable','off');
             %set(handles.EditNumberOfScenarios,'enable','off');
             set(handles.SaveEveryScenarios,'enable','off');

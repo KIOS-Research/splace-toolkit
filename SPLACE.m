@@ -231,7 +231,7 @@ function LoadInputFile_Callback(hObject, eventdata, handles)
         pathname=[pwd,'\RESULTS\'];
         save([pwd,'\RESULTS\','pathname.File'],'pathname','-mat');
         warning on;
-        if isempty(B.errcode)% || isempty(B.NodeCount)
+        if isempty(B.Errcode)% || isempty(B.NodeCount)
             opening(hObject, 1, handles);
             s = [['Could not open network "',inputfile,'".'] {'Please insert the correct filename(*.inp).'}];
             set(handles.LoadText,'Value',length(s));

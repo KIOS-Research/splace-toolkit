@@ -89,13 +89,13 @@ function Evolutionary_OpeningFcn(hObject, eventdata, handles, varargin)
         if ~isempty([handles.file0,'.0']) 
             load([pathname,handles.file0,'.0'],'-mat');
         else
-            B.inputfile=handles.B.inputfile;
+            B.InputFile=handles.B.InputFile;
         end
     else
-        B.inputfile=[];
+        B.InputFile=[];
     end
 
-    if ~strcmp(handles.B.inputfile,B.inputfile)
+    if ~strcmp(handles.B.InputFile,B.InputFile)
         set(handles.FileText0,'String','')
     else
         set(handles.FileText0,'String',[handles.file0,'.0'])
@@ -442,7 +442,7 @@ function LoadScenarios_Callback(hObject, eventdata, handles)
     if ~isempty((file0)) 
         load([pathname,file0,'.0'],'-mat');clc;
         handles.file0=file0;
-        if ~strcmp(handles.B.inputfile,B.inputfile)
+        if ~strcmp(handles.B.InputFile,B.InputFile)
             set(handles.Solve,'enable','off');
             set(handles.LoadImpactMatrix,'enable','off');
             load([pwd,'\RESULTS\','ComWind.messsages'],'msg','-mat');

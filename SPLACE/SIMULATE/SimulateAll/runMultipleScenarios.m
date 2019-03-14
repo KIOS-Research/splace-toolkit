@@ -34,7 +34,7 @@ function runMultipleScenarios(varargin)
         B.setLinkLength(P.FlowParamScenarios{2}(:, P.ScenariosFlowIndex(i,2))')
         B.setLinkRoughnessCoeff(P.FlowParamScenarios{3}(:, P.ScenariosFlowIndex(i,3))')
         B.setNodeElevations(P.FlowParamScenarios{4}(:, P.ScenariosFlowIndex(i,4))')
-        B.setNodeBaseDemands(P.FlowParamScenarios{5}(:, P.ScenariosFlowIndex(i,5))')
+        B.setNodeBaseDemands({P.FlowParamScenarios{5}(:, P.ScenariosFlowIndex(i,5))'})
         if size(P.Patterns,1)==1
             B.setPatternMatrix(P.FlowParamScenarios{6}(:,P.ScenariosFlowIndex(i,6))')
         else
