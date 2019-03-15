@@ -73,7 +73,8 @@ function GridParameters_OpeningFcn(hObject, eventdata, handles, varargin)
     % uiwait(handles.figure1);
 
     set(handles.figure1,'name','Create Scenarios (Grid)');
-    set(handles.figure1,'Position',[75 15 164.5 39]);
+    pos = get(handles.figure1, 'Position');
+    set(handles.figure1,'Position',[75 15 pos(3) pos(4)]);
     handles.LoadText=varargin{1}.LoadText;
     handles.B=varargin{1}.B;
     % Update handles structure

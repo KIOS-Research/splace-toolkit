@@ -187,7 +187,7 @@ function LoadInputFile_Callback(hObject, eventdata, handles)
 % hObject    handle to LoadInputFile (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-
+    
     set(handles.CreateScenarios,'enable','inactive');
     set(handles.runMultipleScenarios,'enable','inactive');
     set(handles.ComputeImpactMatrix,'enable','inactive');
@@ -196,11 +196,8 @@ function LoadInputFile_Callback(hObject, eventdata, handles)
     
     [inputfile,~] = uigetfile('NETWORKS\*.inp');
 
-%     PathFile = strcat(PathFile,inputfile);
     if inputfile~=0
-%         if libisloaded('epanet2')
-%            unloadlibrary('epanet2');
-%         end
+
         col = get(handles.LoadInputFile,'backg');  % Get the background color of the figure.
         set(handles.LoadInputFile,'str','LOADING...','backg','w') % Change color of button. 
         % The pause (or drawnow) is necessary to make button changes appear.
@@ -210,7 +207,7 @@ function LoadInputFile_Callback(hObject, eventdata, handles)
         % pushbutton is supposed to activate. 
         % Next we simulate some running process.  Here just sort a vector.
         
-        B=epanet(['NETWORKS/',inputfile]); %clc;
+        B=epanet(inputfile); %clc;
 
         handles.B = B; warning off;
         if exist('File0.File','file')==2
@@ -256,7 +253,7 @@ function LoadInputFile_Callback(hObject, eventdata, handles)
         try 
             cla(handles.previousg)
             handles.previousg=axes('Parent',handles.axes1);
-            B.plot('axes',handles.previousg); 
+            B.plot('axes',handles.previousg, 'extend', 'no'); 
         catch e
         end
         set(handles.axes1,'HighlightColor','k')
@@ -423,9 +420,21 @@ function figure1_CloseRequestFcn(hObject, eventdata, handles)
 % Hint: delete(hObject) closes the figure
     delete(hObject);
 
-    if libisloaded('epanet2')
-       unloadlibrary('epanet2');
+    rmpath(genpath(pwd));
+    try
+        handles.B.unload()
+    catch
     end
+    try
+        unloadlibrary('epanet2')
+    catch
+    end
+    try
+        delete([pwd, '\NETWORKS\*.txt'])
+        delete([pwd, '\NETWORKS\*_temp.inp'])
+    catch
+    end
+    
     clc;
     close(findobj('type','figure','name','Release Location'));
     close(findobj('type','figure','name','Solve Sensor Placement'));
@@ -437,18 +446,6 @@ function figure1_CloseRequestFcn(hObject, eventdata, handles)
     close(findobj('type','figure','name','Simulate Random Scenarios'));
     close(findobj('type','figure','name','Create Scenarios (Grid)'));
 
-    rmpath(genpath(pwd));
-    
-    %Delete s files 
-    a='abcdefghijklmnoqrstuvwxyz';
-    for i=1:length(a)
-        s=sprintf('s%s*',a(i));
-        delete(s)
-    end
-    for i=1:9
-        s=sprintf('s%.f*',i);
-        delete(s)
-    end
     % --- Executes on button press in ComputeImpactMatrix.
 function ComputeImpactMatrix_Callback(hObject, eventdata, handles)
 % hObject    handle to ComputeImpactMatrix (see GCBO)
@@ -646,9 +643,21 @@ function Exit_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
     set(handles.figure1,'Visible','off');
-    if libisloaded('epanet2')
-       unloadlibrary('epanet2');
+    rmpath(genpath(pwd));
+    try
+        handles.B.unload()
+    catch
     end
+    try
+        unloadlibrary('epanet2')
+    catch
+    end
+    try
+        delete([pwd, '\NETWORKS\*.txt'])
+        delete([pwd, '\NETWORKS\*_temp.inp'])
+    catch
+    end
+
     clc;
     close(findobj('type','figure','name','Release Location'));
     close(findobj('type','figure','name','Solve Sensor Placement'));
@@ -656,19 +665,6 @@ function Exit_Callback(hObject, eventdata, handles)
     close(findobj('type','figure','name','Compute Impact Matrix (CWCV)'));
     close(findobj('type','figure','name','Solve with exhaustive method..'));
     close(findobj('type','figure','name','Create Scenarios (Grid)'));
-
-    rmpath(genpath(pwd));
-    
-    %Delete s files 
-    a='abcdefghijklmnoqrstuvwxyz';
-    for i=1:length(a)
-        s=sprintf('s%s*',a(i));
-        delete(s)
-    end
-    for i=1:9
-        s=sprintf('s%.f*',i);
-        delete(s)
-    end
     
 % --- Executes on selection change in SplaceTable.
 function SplaceTable_Callback(hObject, eventdata, handles)
@@ -1231,17 +1227,20 @@ function SaveNetwork_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
     % graphs
-    prompt={'Enter the file name:'};
-    answer=inputdlg(prompt);
+    prompt={'Enter the file name of png:'};
+    name='Save as png';
+    numlines=1;
+    defaultanswer={'net_temp'};
+    options.Resize='on';
+    answer=inputdlg(prompt,name,numlines,defaultanswer,options);
     
     if ~isempty(answer)
         answer=char(answer);
+   
         f=getframe(handles.figure1);
-        imwrite(f.cdata,[answer,'.bmp'],'bmp');
+        imwrite(f.cdata,[answer,'.png'],'png');
         figure(1);
-        imshow([answer,'.bmp']);
-        % save to pdf and bmp
-        print(gcf,'-dpdf',answer,sprintf('-r%d',150));
+        imshow([answer,'.png']);
         close(1);   
     end
 
