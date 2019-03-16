@@ -18,11 +18,14 @@ function runMultipleScenarios(varargin)
         file0=varargin{1}.file0;
         T=varargin{1}.T;
         load([pwd,'\RESULTS\','pathname.File'],'pathname','-mat');
+        binary_file = varargin{1}.binary_file;
     else
         file0=varargin{1};
         T=100; %save every 1000 scenarios
         pathname=[pwd,'\RESULTS\'];
+        binary_file = varargin{2};
     end
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     load([pathname,file0,'.0'],'-mat')
     B.setQualityType('chem','mg/L')
@@ -34,26 +37,29 @@ function runMultipleScenarios(varargin)
         B.setLinkLength(P.FlowParamScenarios{2}(:, P.ScenariosFlowIndex(i,2))')
         B.setLinkRoughnessCoeff(P.FlowParamScenarios{3}(:, P.ScenariosFlowIndex(i,3))')
         B.setNodeElevations(P.FlowParamScenarios{4}(:, P.ScenariosFlowIndex(i,4))')
-        B.setNodeBaseDemands({P.FlowParamScenarios{5}(:, P.ScenariosFlowIndex(i,5))'})
+        bs = P.FlowParamScenarios{5}(:, P.ScenariosFlowIndex(i,5))';
+        for n = 1:B.getNodeCount
+            B.setNodeBaseDemands(n, bs(n))
+        end
         if size(P.Patterns,1)==1
             B.setPatternMatrix(P.FlowParamScenarios{6}(:,P.ScenariosFlowIndex(i,6))')
         else
             B.setPatternMatrix(P.FlowParamScenarios{6}(:,:,P.ScenariosFlowIndex(i,6))')
         end
-        B.solveCompleteHydraulics
-        B.saveHydraulicFile([pathname,file0,'.h',num2str(i)])
+        if ~binary_file
+            B.solveCompleteHydraulics
+            B.saveHydraulicFile([pathname,file0,'.h',num2str(i)])            
+        end
     end
     
 %     disp('Create Quality files')
-    pstep=double(B.getTimePatternStep);
+    pstep=P.PatternTimeStep;
     B.setTimeQualityStep(pstep);
     zeroNodes=zeros(1,B.NodeCount);
     B.setNodeInitialQuality(zeroNodes);
     B.setLinkBulkReactionCoeff(zeros(1,B.LinkCount));
     B.setLinkWallReactionCoeff(zeros(1,B.LinkCount));
-    for i=1:B.NodeCount
-        B.setNodeSourceType(i,'SETPOINT');
-    end
+    
     patlen=(P.SimulationTime)*3600/pstep;
     if P.newTotalofScenarios ~= P.TotalScenarios
         P.ScenariosFlowIndex=cartesianProduct(P.FlowScenarioSets);
@@ -70,12 +76,19 @@ function runMultipleScenarios(varargin)
     for j=1:(sizeflowscenarios*sizecontscenarios)
         if mod(j,sizecontscenarios)==1
             l=l+1;
-            tmphydfile=[pathname,file0,'.h',num2str(l)];
-            B.useHydraulicFile(tmphydfile);
             disp(['Hydraulic Scenario ',num2str(l)])
             st2=0;
             avtime=inf;
-            D{l}=B.getComputedQualityTimeSeries('time','demandSensingNodes',SensingNodeIndices_NodeBaseDemands);
+            if ~binary_file
+                tmphydfile=[pathname,file0,'.h',num2str(l)];
+                B.useHydraulicFile(tmphydfile);
+                D{l}=B.getComputedQualityTimeSeries('time','demandSensingNodes',SensingNodeIndices_NodeBaseDemands);
+            else
+                res = B.getComputedTimeSeries;
+                D{l}.DemandSensingNodes = res.Demand(:, SensingNodeIndices_NodeBaseDemands);
+                D{l}.Time = res.Time;
+                D{l}.SensingNodesIndices = SensingNodeIndices_NodeBaseDemands;
+            end
             i=1;
         end
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -101,13 +114,21 @@ function runMultipleScenarios(varargin)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         if tmpinjloc~=0
             tmp2(tmpinjloc)=tmp1;
+            nd_index = find(tmp2);
+            B.setNodeSourceType(nd_index, 'SETPOINT');
             B.setNodeSourcePatternIndex(tmp2);
             tmp2 = zeroNodes;
             tmp2(tmpinjloc)=P.SourceParamScenarios{1}(P.ScenariosContamIndex(i,1));
             B.setNodeSourceQuality(tmp2)
         end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-        C{k}=B.getComputedQualityTimeSeries('qualitySensingNodes',SensingNodeIndices_NodeBaseDemands);
+        if ~binary_file
+            C{k}=B.getComputedQualityTimeSeries('qualitySensingNodes',SensingNodeIndices_NodeBaseDemands);
+        else
+            res = B.getComputedTimeSeries;
+            C{k}.QualitySensingNodes = res.NodeQuality(:, SensingNodeIndices_NodeBaseDemands);
+            C{k}.SensingNodesIndices = SensingNodeIndices_NodeBaseDemands;
+        end 
         d(k)=l;
         t2=toc(t1);
         st2=st2+t2;

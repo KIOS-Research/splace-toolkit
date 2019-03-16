@@ -59,13 +59,13 @@ function SimulateRandom_OpeningFcn(hObject, eventdata, handles, varargin)
         if ~isempty([handles.file0,'.0']) 
             load([pathname,handles.file0,'.0'],'-mat');
         else
-            B.inputfile=handles.B.inputfile;
+            B.InputFile=handles.B.InputFile;
         end
     else
-        B.inputfile=[];
+        B.InputFile=[];
     end
 
-    if ~strcmp(handles.B.inputfile,B.inputfile)
+    if ~strcmp(handles.B.InputFile,B.InputFile)
         set(handles.start,'enable','off');
         set(handles.SaveEveryScenarios,'enable','off');
         set(handles.EditNumberOfScenarios,'enable','off');
@@ -122,12 +122,13 @@ function start_Callback(hObject, eventdata, handles)
     
     set(handles.start,'enable','off');
     set(handles.load,'enable','off');
-    
+    handles.binary_file = get(handles.checkbox1, 'Value');
+        
     runRandomScenarios(handles);
-    if libisloaded('epanet2')
-        unloadlibrary('epanet2');
-    end
-    handles.B=epanet(handles.B.inputfile);clc;
+%     if libisloaded('epanet2')
+%         unloadlibrary('epanet2');
+%     end
+%     handles.B=epanet(handles.B.InputFile);clc;
     pause(0.1);
     close;
 
@@ -157,7 +158,7 @@ function load_Callback(hObject, eventdata, handles)
         save([pwd,'\RESULTS\','File0.File'],'file0','-mat');
         load([pathname,file0,'.0'],'-mat');
         handles.file0=file0;
-        if ~strcmp(handles.B.inputfile,B.inputfile)
+        if ~strcmp(handles.B.InputFile,B.InputFile)
             set(handles.start,'enable','off');
             set(handles.EditNumberOfScenarios,'enable','off');
             set(handles.SaveEveryScenarios,'enable','off');
@@ -246,3 +247,21 @@ function TotalScenarios_CreateFcn(hObject, eventdata, handles)
 % hObject    handle to TotalScenarios (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
+
+
+% --- Executes on button press in checkbox1.
+function checkbox1_Callback(hObject, eventdata, handles)
+% hObject    handle to checkbox1 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of checkbox1
+
+if get(handles.checkbox1, 'Value') 
+    set(handles.SaveEveryScenarios, 'Enable', 'off')
+    set(handles.text, 'Enable', 'off')
+else
+    set(handles.SaveEveryScenarios, 'Enable', 'on')
+    set(handles.text, 'Enable', 'on')
+end
+
