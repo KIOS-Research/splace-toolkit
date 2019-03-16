@@ -436,16 +436,18 @@ function figure1_CloseRequestFcn(hObject, eventdata, handles)
     end
     
     clc;
-    close(findobj('type','figure','name','Release Location'));
-    close(findobj('type','figure','name','Solve Sensor Placement'));
-    close(findobj('type','figure','name','Compute Impact Matrix (CWCV)'));
-    close(findobj('type','figure','name','Solve with exhaustive method..'));
-    close(findobj('type','figure','name','Solve with test1 method..'));
-    close(findobj('type','figure','name','Solve with test2 method..'));
-    close(findobj('type','figure','name','Simulate All Scenarios'));
-    close(findobj('type','figure','name','Simulate Random Scenarios'));
-    close(findobj('type','figure','name','Create Scenarios (Grid)'));
-
+    try
+        close(findobj('type','figure','name','Release Location'));
+        close(findobj('type','figure','name','Solve Sensor Placement'));
+        close(findobj('type','figure','name','Compute Impact Matrix (CWCV)'));
+        close(findobj('type','figure','name','Solve with exhaustive method..'));
+        close(findobj('type','figure','name','Solve with test1 method..'));
+        close(findobj('type','figure','name','Solve with test2 method..'));
+        close(findobj('type','figure','name','Simulate All Scenarios'));
+        close(findobj('type','figure','name','Simulate Random Scenarios'));
+        close(findobj('type','figure','name','Create Scenarios (Grid)'));
+    catch
+    end
     % --- Executes on button press in ComputeImpactMatrix.
 function ComputeImpactMatrix_Callback(hObject, eventdata, handles)
 % hObject    handle to ComputeImpactMatrix (see GCBO)
@@ -659,12 +661,18 @@ function Exit_Callback(hObject, eventdata, handles)
     end
 
     clc;
-    close(findobj('type','figure','name','Release Location'));
-    close(findobj('type','figure','name','Solve Sensor Placement'));
-    close(findobj('type','figure','name','Run Multiple Scenarios'));
-    close(findobj('type','figure','name','Compute Impact Matrix (CWCV)'));
-    close(findobj('type','figure','name','Solve with exhaustive method..'));
-    close(findobj('type','figure','name','Create Scenarios (Grid)'));
+    try
+        close(findobj('type','figure','name','Release Location'));
+        close(findobj('type','figure','name','Solve Sensor Placement'));
+        close(findobj('type','figure','name','Compute Impact Matrix (CWCV)'));
+        close(findobj('type','figure','name','Solve with exhaustive method..'));
+        close(findobj('type','figure','name','Solve with test1 method..'));
+        close(findobj('type','figure','name','Solve with test2 method..'));
+        close(findobj('type','figure','name','Simulate All Scenarios'));
+        close(findobj('type','figure','name','Simulate Random Scenarios'));
+        close(findobj('type','figure','name','Create Scenarios (Grid)'));
+    catch
+    end
     
 % --- Executes on selection change in SplaceTable.
 function SplaceTable_Callback(hObject, eventdata, handles)
