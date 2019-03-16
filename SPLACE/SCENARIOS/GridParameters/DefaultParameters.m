@@ -24,7 +24,7 @@ function P=DefaultParameters(varargin)
     P.MethodParameter=NaN;
 
     %TIMES
-    P.PatternTimeStep=B.getTimePatternStep;
+    P.PatternTimeStep=B.TimePatternStep;
     P.SimulationTime=48; %e.g.48 in Hours
 
 
@@ -46,14 +46,14 @@ function P=DefaultParameters(varargin)
     %P.SourcesNodeIndices=89;
 
     %AFFECTING FLOWS
-    P.Diameters=B.getLinkDiameter;
-    P.Lengths=B.getLinkLength;
-    P.Roughness=B.getLinkRoughnessCoeff;
-    P.Elevation=B.getNodeElevations;
-    P.BaseDemand=B.getNodeBaseDemands{1};
+    P.Diameters=B.LinkDiameter;
+    P.Lengths=B.LinkLength;
+    P.Roughness=B.LinkRoughnessCoeff;
+    P.Elevation=B.NodeElevations;
+    P.BaseDemand=B.NodeBaseDemands{1};
     %P.SourcesNodeIndicesNonZero=P.BaseDemand~=0;
     P.NodesNonZeroDemands=find(P.BaseDemand>0);
-    P.Patterns=B.getPattern;
+    P.Patterns=B.Pattern;
 
     P.FlowParameters={'Diameters', 'Lengths','Roughness',...
         'Elevation','BaseDemand','Patterns'};

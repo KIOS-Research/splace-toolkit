@@ -149,13 +149,13 @@ function SetGuiParameters(P,B,hObject,handles)
     LinkTableColumnName = cell(1,B.LinkCount+2);
     LinkTableColumnName(1,1)={'%'};
     LinkTableColumnName(1,2)={'Samples'};
-    LinkTableColumnName(1,3:B.LinkCount+2)=B.getLinkNameID;
+    LinkTableColumnName(1,3:B.LinkCount+2)=B.LinkNameID;
     set(handles.LinkTable, 'ColumnName', LinkTableColumnName);
     set(handles.LinkTable,'RowName',{'Diameters','Lengths','Roughness'});
 
     NodeTableColumnName(1,1)={'%'};
     NodeTableColumnName(1,2)={'Samples'};
-    NodeTableColumnName(1,3:B.NodeCount+2)=B.getNodeNameID;
+    NodeTableColumnName(1,3:B.NodeCount+2)=B.NodeNameID;
     set(handles.NodeTable, 'ColumnName', NodeTableColumnName);
     set(handles.NodeTable,'RowName',{'Elevations','Basedemands'});
 
