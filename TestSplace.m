@@ -18,7 +18,7 @@ function Y=TestSplace
     clear
     clc
     file0='file0'; % in gidmethod
-    B=epanet('NETWORKS/Net1_Rossman2000.inp');
+    B=epanet('Net1_Rossman2000.inp');
     P=gridmethod(B);
     runMultipleScenarios(file0, 1); %file0 name & 1=use binary or 0=without binary
     ComputeImpactMatrices(file0);
