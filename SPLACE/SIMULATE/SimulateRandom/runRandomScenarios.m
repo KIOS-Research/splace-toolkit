@@ -148,7 +148,7 @@ function [P]=runRandomScenarios(varargin)
 %         end
         d(k)=l;
         t2=toc(t1);
-        disp(['[Scenario]: ',num2str(i), '  [Waiting time]: ', num2str((sizeflowscenarios*sizecontscenarios-i)*t2), '(sec)'])
+        disp(['[Scenario]: ',num2str(i)])
         st2=st2+t2;
         avtime=st2/i;
         i=i+1;  
