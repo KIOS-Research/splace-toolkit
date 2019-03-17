@@ -38,8 +38,7 @@ function ExhaustiveOptimization(varargin)
     Y.F=[];
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     if isstruct(varargin{1}) 
-        [v.figure1,v.axes2,v.text_progress]=SolveLoadGui;
-        v.str='Solve with exhaustive method..';
+        progressbar('Solve with exhaustive method..')
         for j=numberOfSensors
             total(j) = nchoosek(length(1:B.NodeCount),j);
         end
@@ -55,8 +54,7 @@ function ExhaustiveOptimization(varargin)
             if isstruct(varargin{1}) 
                 if mod(pp,100)==1
                     nload=pp/total;
-                    v.color=char('red');
-                    progressbar(v,nload);
+                    progressbar(nload);
                 end
                 pp=pp+1;
             end
@@ -100,11 +98,8 @@ function ExhaustiveOptimization(varargin)
         k=k+1;
     end
     save([pathname,file0,'.y0'],'Y', '-mat');
+    progressbar(1);
 
-    %%%%%%%%%%%%%%%%
-    if isstruct(varargin{1}) 
-        close(v.figure1);
-    end
     %%%%%%%%%%%%%%%%
 end
 

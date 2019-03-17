@@ -36,7 +36,7 @@ function varargout = SPLACE(varargin)
 
 % Edit the above text to modify the response to help SPLACE
 
-% Last Modified by GUIDE v2.5 23-Jan-2015 02:06:41
+% Last Modified by GUIDE v2.5 17-Mar-2019 14:17:44
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -84,7 +84,7 @@ end
 function opening(hObject, eventdata, handles)
         
     set(handles.figure1,'name','S-Place: Quality Sensor Placement in Water Distribution Systems');
-    ScreenSize=get(0,'ScreenSize');
+    %ScreenSize=get(0,'ScreenSize');
 
     position = get(handles.figure1,'Position');
     set(handles.figure1,'Position',[position(1) position(2) 206.5 54])
@@ -95,7 +95,8 @@ function opening(hObject, eventdata, handles)
     set(handles.ComputeImpactMatrix,'enable','off');
     set(handles.SolveSensorPlacement,'enable','off');
     set(handles.SplaceTable,'visible','on');
-    
+    set(handles.export_sensors,'visible','off');
+
     set(handles.SaveNetwork,'visible','off');
     set(handles.Zoom,'visible','off');
     set(handles.NodesID,'visible','off');
@@ -154,7 +155,7 @@ function opening(hObject, eventdata, handles)
     handles.dataplots=[];
     handles.file=[];
     handles.previousg=axes('Parent',handles.axes1);
-    if eventdata
+    if ~isempty(eventdata)
         handles.logo=imshow([pwd,'\HELP\white.png'],'Parent',handles.previousg);
     else
         handles.logo=imshow([pwd,'\HELP\splace2.png'],'Parent',handles.previousg);
@@ -167,7 +168,7 @@ function opening(hObject, eventdata, handles)
     set(handles.FontsizeENplotText,'visible','off');
     set(handles.FontsizeENplot,'visible','off');
     set(handles.flowUnits,'visible','off');
-    
+
     % Update handles structure
     guidata(hObject, handles);
     
@@ -218,12 +219,6 @@ function LoadInputFile_Callback(hObject, eventdata, handles)
         if exist([pwd,'\RESULTS\','h1.f'])==2
             delete([pwd,'\RESULTS\','h1.f'],'h1','-mat');
         end
-        if exist([pwd,'\RESULTS\','hNodesIhandles.B.f'])==2
-            delete([pwd,'\RESULTS\','hNodesIhandles.B.f'],'hNodesID','-mat');
-        end
-        if exist([pwd,'\RESULTS\','hLinksIhandles.B.f'])==2
-            delete([pwd,'\RESULTS\','hLinksIhandles.B.f'],'hLinksID','-mat');
-        end
         
         pathname=[pwd,'\RESULTS\'];
         save([pwd,'\RESULTS\','pathname.File'],'pathname','-mat');
@@ -254,7 +249,7 @@ function LoadInputFile_Callback(hObject, eventdata, handles)
             cla(handles.previousg)
             handles.previousg=axes('Parent',handles.axes1);
             B.plot('axes',handles.previousg, 'extend', 'no'); 
-        catch e
+        catch
         end
         set(handles.axes1,'HighlightColor','k')
         
@@ -274,29 +269,19 @@ function LoadInputFile_Callback(hObject, eventdata, handles)
         set(handles.NodesID,'visible','on');
         set(handles.LinksID,'visible','on');      
         set(handles.NodesID,'value',0);
-        set(handles.LinksID,'value',0);
-        
         set(handles.FontsizeENplotText,'visible','on');
         set(handles.FontsizeENplot,'visible','on');
         set(handles.SplaceTable,'String','');
-            
-%         set(handles.frameOfNet,'Visible','off');
         set(handles.NodesID,'value',0);
         set(handles.LinksID,'value',0);
         set(handles.FontsizeENplot,'String',12);
-        set(handles.SaveNetwork,'visible','on');
-        set(handles.Zoom,'visible','on');
-        set(handles.pan,'visible','on');
-        set(handles.NodesID,'visible','on');
-        set(handles.LinksID,'visible','on');  
-        set(handles.FontsizeENplot,'visible','on');
-        set(handles.FontsizeENplotText,'visible','on');   
+        set(handles.pan,'visible','on'); 
         set(handles.flowUnits,'visible','on');
         set(handles.flowUnits,'string',['Flow Units: ',char(handles.B.LinkFlowUnits)]);
         
         try
             delete(handles.logo);
-        catch err
+        catch
         end
         guidata(hObject, handles);
         
@@ -325,8 +310,11 @@ function runMultipleScenarios_Callback(hObject, eventdata, handles)
     set(handles.ComputeImpactMatrix,'enable','inactive');
     set(handles.SolveSensorPlacement,'enable','inactive');
     
-    close(findobj('type','figure','name','Simulate All Scenarios'))
-    close(findobj('type','figure','name','Simulate Random Scenarios'))
+    try
+        close(findobj('type','figure','name','Simulate All Scenarios'))
+        close(findobj('type','figure','name','Simulate Random Scenarios'))
+    catch
+    end
     load([pwd,'\RESULTS\','pathname.File'],'pathname','-mat');
     
     if exist('File0.File','file')==2 
@@ -335,20 +323,11 @@ function runMultipleScenarios_Callback(hObject, eventdata, handles)
             if ~isempty(file0) 
                 load([pathname,file0],'-mat');
             else
-                B.inputfile=handles.B.inputfile;
+                B.InputFile=handles.B.InputFile;
             end
         else
-            B.inputfile=[];
+            B.InputFile=[];
         end
-%         if ~strcmp(handles.B.inputfile,B.inputfile)         
-%             load([pwd,'\RESULTS\','ComWind.messsages'],'msg','-mat');
-%             msg=[msg;{'>>Cannot find file.'}];
-%             set(handles.LoadText,'String',msg);
-%             msg=[msg;{'>>Load new file0.'}];
-%             set(handles.LoadText,'String',msg);
-%             set(handles.LoadText,'Value',length(msg)); 
-%             save([pwd,'\RESULTS\','ComWind.messsages'],'msg','-mat');
-%         end
     else
         file0=[];
     end
@@ -384,7 +363,10 @@ function CreateScenarios_Callback(hObject, eventdata, handles)
     set(handles.SolveSensorPlacement,'enable','inactive');
     set(handles.Exit,'enable','inactive');
     
-    close(findobj('type','figure','name','Create Scenarios (Grid)'));
+    try
+        close(findobj('type','figure','name','Create Scenarios (Grid)'));
+    catch
+    end
     arguments.LoadText = handles.LoadText;
     arguments.B = handles.B; 
     
@@ -459,7 +441,10 @@ function ComputeImpactMatrix_Callback(hObject, eventdata, handles)
     set(handles.SolveSensorPlacement,'enable','inactive');
     set(handles.Exit,'enable','inactive');
     
-    close(findobj('type','figure','name','Compute Impact Matrix (CWCV)'));
+    try
+        close(findobj('type','figure','name','Compute Impact Matrix (CWCV)'));
+    catch
+    end
     load([pwd,'\RESULTS\','pathname.File'],'pathname','-mat');
 
     if exist('File0.File','file')==2 
@@ -476,10 +461,10 @@ function ComputeImpactMatrix_Callback(hObject, eventdata, handles)
                 if ~isempty(file0) 
                     load([pathname,file0],'-mat');
                 else
-                    B.inputfile=handles.B.inputfile;
+                    B.InputFile=handles.B.InputFile;
                 end
             else
-                B.inputfile=[];
+                B.InputFile=[];
                 load([pwd,'\RESULTS\','ComWind.messsages'],'msg','-mat');
                 set(handles.LoadText,'Value',1);
                 msg=[msg;{'>>First must be run Simulate Scenarios.'}];
@@ -494,16 +479,6 @@ function ComputeImpactMatrix_Callback(hObject, eventdata, handles)
                 return
             end
         end
-%         if ~strcmp(handles.B.inputfile,B.inputfile)             
-%             load([pwd,'\RESULTS\','ComWind.messsages'],'msg','-mat');
-%             set(handles.LoadText,'Value',1);
-%             msg=[msg;{'>>Cannot find file.'}];
-%             set(handles.LoadText,'String',msg);
-%             msg=[msg;{'>>Load new file0.'}];
-%             set(handles.LoadText,'String',msg);
-%             set(handles.LoadText,'Value',length(msg)); 
-%             save([pwd,'\RESULTS\','ComWind.messsages'],'msg','-mat');
-%         end
     else
         file0=[];
     end
@@ -561,7 +536,10 @@ function SolveSensorPlacement_Callback(hObject, eventdata, handles)
     set(handles.ComputeImpactMatrix,'enable','inactive');
     set(handles.Exit,'enable','inactive');
     
-    close(findobj('type','figure','name','Solve Sensor Placement'))
+    try
+        close(findobj('type','figure','name','Solve Sensor Placement'))
+    catch
+    end
     load([pwd,'\RESULTS\','pathname.File'],'pathname','-mat');
 
     if exist('File0.File','file')==2 
@@ -581,23 +559,11 @@ function SolveSensorPlacement_Callback(hObject, eventdata, handles)
                     save([pwd,'\RESULTS\','ComWind.messsages'],'msg','-mat');
                 end
             else
-                B.inputfile=handles.B.inputfile;
+                B.InputFile=handles.B.InputFile;
             end
         else
-            B.inputfile=[];
+            B.InputFile=[];
         end
-%         if ~strcmp(handles.B.inputfile,B.inputfile)         
-%             load([pwd,'\RESULTS\','ComWind.messsages'],'msg','-mat');
-%             set(handles.LoadText,'Value',1);
-%             msg=[msg;{'>>Cannot find file.'}];
-%             set(handles.LoadText,'String',msg);
-%             msg=[msg;{'>>Select Create Scenarios.'}];
-%             set(handles.LoadText,'String',msg);
-%             msg=[msg;{'>>Or Load new.'}];
-%             set(handles.LoadText,'String',msg);
-%             set(handles.LoadText,'Value',length(msg));
-%             save([pwd,'\RESULTS\','ComWind.messsages'],'msg','-mat');
-%         end
     else
         file0=[];
     end
@@ -605,7 +571,10 @@ function SolveSensorPlacement_Callback(hObject, eventdata, handles)
     arguments.file0=file0(1:end-2);
     arguments.B=handles.B;
     arguments.LoadText = handles.LoadText;
-    arguments.SplaceTable = handles.SplaceTable;    
+    arguments.SplaceTable = handles.SplaceTable; 
+    arguments.export_sensors = handles.export_sensors;
+    arguments.axes1 = handles.axes1;
+        
     tmp1=get(handles.Optimization,'value');
     tmp2=get(handles.Optimization,'string');    
     %SolveSensorPlacementGui(arguments);
@@ -681,17 +650,6 @@ function SplaceTable_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 % Hints: contents = cellstr(get(hObject,'String')) returns SplaceTable contents as cell array
-%        contents{get(hObject,'Value')} returns selected item from SplaceTable
-    if exist([pwd,'\RESULTS\','hNodesIhandles.B.f'])==2
-        load([pwd,'\RESULTS\','hNodesIhandles.B.f'],'hNodesID','-mat');
-        delete(hNodesID(:)); hNodesID=[];
-        save([pwd,'\RESULTS\','hNodesIhandles.B.f'],'hNodesID','-mat');    
-    end
-    if exist([pwd,'\RESULTS\','hLinksIhandles.B.f'])==2
-        load([pwd,'\RESULTS\','hLinksIhandles.B.f'],'hLinksID','-mat');
-        delete(hLinksID(:)); hLinksID=[];
-        save([pwd,'\RESULTS\','hLinksIhandles.B.f'],'hLinksID','-mat');
-    end
     
     FontSize = str2num(get(handles.FontsizeENplot,'String'));
     if  ~length(FontSize) || FontSize<0 || FontSize>20
@@ -709,46 +667,49 @@ function SplaceTable_Callback(hObject, eventdata, handles)
     tline = regexp(tline,'\s*','split');
     tline = tline{1};
     if length(tline)>2
-        
         if exist([pwd,'\RESULTS\','h1.f'])==2
-            load([pwd,'\RESULTS\','h1.f'],'h1','IndexID','-mat');
+            load([pwd,'\RESULTS\','h1.f'],'h1','h2','IndexID','-mat');
             for i=1:length(IndexID)
                 C1='b'; C2='b';
-                if isequal(IndexID,handles.B.NodeReservoirIndex)
+                if sum(IndexID(i)==handles.B.NodeReservoirIndex)
                     C2='g'; C1='g';
-                elseif isequal(IndexID,handles.B.NodeTankIndex)
+                elseif sum(IndexID(i)==handles.B.NodeTankIndex)
                     C2='k'; C1='k';
+                end
+                try
+                axes(handles.axes1); 
+                catch
                 end
                 plot(handles.B.NodeCoordinates{1}(IndexID(i)),handles.B.NodeCoordinates{2}(IndexID(i)),'o','LineWidth',2,'MarkerEdgeColor',C1,...
                 'MarkerFaceColor',C2,'MarkerSize',5);
-                if h1~=1
+                try
+                    delete(findall(handles.axes1,'Type','text'));
                     delete(h1(:)); h1=[];
+                    delete(h2(:)); h2=[];
+                catch
                 end
             end
-            IndexID=[];
         end
-    
-        if length(tline)==5
-            SensorsNodesID=tline(end);
-        else
-            SensorsNodesID=tline(6:end);
-        end
+        IndexID=[];
+        ind = find(strcmpi(tline, 'NodesID:'))+1;
+        SensorsNodesID=tline(ind:end);
+
 %         SensorsNodesID=tline(6:end);
         for i=1:length(SensorsNodesID)
-            IndexID(i)= find(strcmpi(handles.B.NodeNameID,SensorsNodesID(i)));
+            IndexID(i)= handles.B.getNodeIndex(SensorsNodesID(i));
             x{i}=handles.B.NodeCoordinates{1}(IndexID(i));
             y{i}=handles.B.NodeCoordinates{2}(IndexID(i));
         end
             
         t=1;
         for u=1:length(SensorsNodesID)
-            plot(x{u}(1),y{u}(1),'o','LineWidth',2,'MarkerEdgeColor','r',...
+            h2(t)=plot(x{u}(1),y{u}(1),'o','LineWidth',2,'MarkerEdgeColor','r',...
                   'MarkerFaceColor','r',...
-                  'MarkerSize',5)
+                  'MarkerSize',5);
             h1(t)=text(x{u}(1),y{u}(1),char(handles.B.NodeNameID(IndexID(u))),'FontSize',FontSize);
             t=t+1;
         end
-        save([pwd,'\RESULTS\','h1.f'],'h1','IndexID','-mat');
+        save([pwd,'\RESULTS\','h1.f'],'h1','h2','IndexID', '-mat');
     end
 
 
@@ -790,8 +751,8 @@ function Zoom_Callback(hObject, eventdata, handles)
     
     if strcmp('Zoom',str) 
         try
-        zoom on;
-        catch err;
+            zoom on;
+        catch 
         end
         set(handles.Zoom,'String','Reset');
         % History
@@ -803,14 +764,14 @@ function Zoom_Callback(hObject, eventdata, handles)
     end
     if strcmp('Reset',str)
         for i=1:2
-        try
-        zoom off;
-        zoom out;
-        zoom reset;
-        catch err;
+            try
+                zoom off;
+                zoom out;
+                zoom reset;
+            catch
+            end
         end
-        end
-        font(hObject, eventdata, handles,1);  
+        font(hObject, eventdata, handles);  
         % History
         load([pwd,'\RESULTS\','ComWind.messsages'],'msg','-mat');
         msg=[msg;{['>>','Reset',' Selected']}];
@@ -818,12 +779,7 @@ function Zoom_Callback(hObject, eventdata, handles)
         set(handles.LoadText,'Value',length(msg));
         save([pwd,'\RESULTS\','ComWind.messsages'],'msg','-mat');
         set(handles.Zoom,'String','Zoom');
-%         set(handles.Tbar,'visible','off');
     end
-    % Update handles structure
-    guidata(hObject, handles);
-    
-
     % Update handles structure
     guidata(hObject, handles);
 
@@ -843,67 +799,31 @@ function LinksID_Callback(hObject, eventdata, handles)
 
 % Hint: get(hObject,'Value') returns toggle state of LinksID
 
-    if exist([pwd,'\RESULTS\','hNodesIhandles.B.f'])==2
-        load([pwd,'\RESULTS\','hNodesIhandles.B.f'],'hNodesID','-mat');
-        delete(hNodesID(:)); hNodesID=[];
-        save([pwd,'\RESULTS\','hNodesIhandles.B.f'],'hNodesID','-mat');    
-    end
-    if exist([pwd,'\RESULTS\','hLinksIhandles.B.f'])==2
-        load([pwd,'\RESULTS\','hLinksIhandles.B.f'],'hLinksID','-mat');
-%         if ~isnumeric(hLinksID)
-%            for i=1:length(hLinksID) 
-%                hLinksID(i).String='';
-%            end
-%         end
-        delete(hLinksID(:)); hLinksID=[];
-        save([pwd,'\RESULTS\','hLinksIhandles.B.f'],'hLinksID','-mat');
-    end
-
-    if exist([pwd,'\RESULTS\','h1.f'])==2
-        load([pwd,'\RESULTS\','h1.f'],'h1','IndexID','-mat');
-        for i=1:length(IndexID)
-            C1='b'; C2='b';
-            if sum(IndexID==handles.B.NodeReservoirIndex)
-                C2='g'; C1='g';
-            elseif sum(IndexID==handles.B.NodeTankIndex)
-                C2='k'; C1='k';
-            end
-            plot(handles.B.NodeCoordinates{1}(IndexID(i)),handles.B.NodeCoordinates{2}(IndexID(i)),'o','LineWidth',2,'MarkerEdgeColor',C1,...
-            'MarkerFaceColor',C2,'MarkerSize',5);
-            if h1~=1
-                delete(h1(:)); h1=[];
-            end
-        end
-        IndexID=[];
-        save([pwd,'\RESULTS\','h1.f'],'h1','IndexID','-mat');
-    end
-        
+    delete(findall(handles.axes1,'Type','text'))    
+    value=get(handles.LinksID,'Value');
     FontSize = str2num(get(handles.FontsizeENplot,'String'));
-    if  ~length(FontSize) || FontSize<0 || FontSize>20
+    if ~length(FontSize) || FontSize<0 || FontSize>30 || FontSize==0
         load([pwd,'\RESULTS\','ComWind.messsages'],'msg','-mat');
-        msg=[msg;{'>>Give Font Size.'}];
+        msg=[msg;{'>>Font Size(max 30).'}];
         set(handles.LoadText,'String',msg);
         set(handles.LoadText,'Value',length(msg));
         save([pwd,'\RESULTS\','ComWind.messsages'],'msg','-mat');
-        return
+        set(handles.FontsizeENplot,'String','12');
+        FontSize=12;
     end
     
-    value=get(handles.LinksID,'Value');
     if value==1
         set(handles.NodesID,'Value',0);
-        
         for i=1:handles.B.LinkCount
-            
             x1=handles.B.NodeCoordinates{1}(handles.B.NodesConnectingLinksIndex(i,1));
             y1=handles.B.NodeCoordinates{2}(handles.B.NodesConnectingLinksIndex(i,1));
-
             x2=handles.B.NodeCoordinates{1}(handles.B.NodesConnectingLinksIndex(i,2));
             y2=handles.B.NodeCoordinates{2}(handles.B.NodesConnectingLinksIndex(i,2));
-            
             hLinksID(i)=text((x1+x2)/2,(y1+y2)/2,handles.B.LinkNameID(i),'FontSize',FontSize);
         end
-        save([pwd,'\RESULTS\','hLinksIhandles.B.f'],'hLinksID','-mat');
     end
+    
+    guidata(hObject, handles);
 
 % --- Executes on button press in NodesID.
 function NodesID_Callback(hObject, eventdata, handles)
@@ -912,56 +832,27 @@ function NodesID_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 % Hint: get(hObject,'Value') returns toggle state of NodesID
-    if exist([pwd,'\RESULTS\','hNodesIhandles.B.f'])==2
-        load([pwd,'\RESULTS\','hNodesIhandles.B.f'],'hNodesID','-mat');
-        delete(hNodesID(:)); hNodesID=[];
-        save([pwd,'\RESULTS\','hNodesIhandles.B.f'],'hNodesID','-mat');    
-    end
-    if exist([pwd,'\RESULTS\','hLinksIhandles.B.f'])==2
-        load([pwd,'\RESULTS\','hLinksIhandles.B.f'],'hLinksID','-mat');
-        delete(hLinksID(:)); hLinksID=[];
-        save([pwd,'\RESULTS\','hLinksIhandles.B.f'],'hLinksID','-mat');
-    end
-
-    if exist([pwd,'\RESULTS\','h1.f'])==2
-        load([pwd,'\RESULTS\','h1.f'],'h1','IndexID','-mat');
-        for i=1:length(IndexID)
-            C1='b'; C2='b';
-            if sum(IndexID==handles.B.NodeReservoirIndex)
-                C2='g'; C1='g';
-            elseif sum(IndexID==handles.B.NodeTankIndex)
-                C2='k'; C1='k';
-            end
-            plot(handles.B.NodeCoordinates{1}(IndexID(i)),handles.B.NodeCoordinates{2}(IndexID(i)),'o','LineWidth',2,'MarkerEdgeColor',C1,...
-            'MarkerFaceColor',C2,'MarkerSize',5);
-            if h1~=1
-                delete(h1(:)); h1=[];
-            end
-        end
-        IndexID=[];
-        save([pwd,'\RESULTS\','h1.f'],'h1','IndexID','-mat');
-    end
-    
+    delete(findall(handles.axes1,'Type','text'))
+    value=get(handles.NodesID,'Value');
     FontSize = str2num(get(handles.FontsizeENplot,'String'));
-    if  ~length(FontSize) || FontSize<0 || FontSize>20
+    if  ~length(FontSize) || FontSize<0 || FontSize>30 || FontSize==0
         load([pwd,'\RESULTS\','ComWind.messsages'],'msg','-mat');
-        msg=[msg;{'>>Give Font Size.'}];
+        msg=[msg;{'>>Font Size(max 30).'}];
         set(handles.LoadText,'String',msg);
         set(handles.LoadText,'Value',length(msg));
         save([pwd,'\RESULTS\','ComWind.messsages'],'msg','-mat');
-        return
+        set(handles.FontsizeENplot,'String','12');
+        FontSize=12;
     end
     
-    
-    value=get(handles.NodesID,'Value');
     if value==1 
         set(handles.LinksID,'Value',0);
         for i=1:handles.B.NodeCount
-            hNodesID(i)=text(handles.B.NodeCoordinates{1}(i),handles.B.NodeCoordinates{2}(i),char(handles.B.NodeNameID(i)),'FontSize',FontSize);
+            hNodesID(i)=text(handles.B.NodeCoordinates{1}(i),handles.B.NodeCoordinates{2}(i),char(handles.B.NodeNameID(i)),'FontSize',FontSize,'Tag','Task String');
         end
-        save([pwd,'\RESULTS\','hNodesIhandles.B.f'],'hNodesID','-mat');
     end
-
+    
+    guidata(hObject, handles);
 
 
 function FontsizeENplot_Callback(hObject, eventdata, handles)
@@ -1198,9 +1089,6 @@ function Close_Callback(hObject, eventdata, handles)
 % hObject    handle to Close (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-    if libisloaded('epanet2')
-        unloadlibrary('epanet2');
-    end
     pathname=[pwd,'\RESULTS\'];
     save([pathname,'pathname.File'],'pathname','-mat');
     
@@ -1272,7 +1160,7 @@ function pan_Callback(hObject, eventdata, handles)
     if strcmp('Pan',str) 
         try
         pan on;
-        catch err
+        catch
         end
         handles.PanIO=0;
         set(handles.pan,'String','Reset');
@@ -1289,9 +1177,9 @@ function pan_Callback(hObject, eventdata, handles)
         zoom out;
         zoom reset;
         pan off;
-        catch err
+        catch
         end
-        font(hObject, eventdata, handles,1);
+        font(hObject, eventdata, handles);
 %         ENplotB('axes',handles.previousg);  
         % History
         load([pwd,'\RESULTS\','ComWind.messsages'],'msg','-mat');
@@ -1307,24 +1195,40 @@ function pan_Callback(hObject, eventdata, handles)
     % Update handles structure
     guidata(hObject, handles);
 
-function font(hObject, eventdata, handles, arg)
+function font(hObject, eventdata, handles)
 
     n=get(handles.NodesID,'value');
     l=get(handles.LinksID,'value');
 
     if n==1
         set(handles.NodesID,'value',0)
-        if arg==0
-            hNodesID=[];
-            save([pwd,'\RESULTS\','hNodesIhandles.B.f'],'hNodesID','-mat');    
-        end
         NodesID_Callback(hObject, eventdata, handles);
     end
     if l==1
-        if arg==0
-            hLinksID=[];
-            save([pwd,'\RESULTS\','hLinksIhandles.B.f'],'hLinksID','-mat'); 
-        end
         set(handles.LinksID,'value',0)
         LinksID_Callback(hObject, eventdata, handles);
     end
+
+
+% --- Executes on button press in export_sensors.
+function export_sensors_Callback(hObject, eventdata, handles)
+% hObject    handle to export_sensors (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+load([pwd,'\RESULTS\','w.report'],'w','-mat');
+
+f = fopen('Senosrs_report.txt', 'w');
+for i=1:length(w)
+fprintf(f, w{i});
+fprintf(f, '\n');
+end
+fprintf(f, '\n');
+
+fprintf(f, '----------------------------------------------------');
+fprintf(f, '\n');
+fprintf(f, '\n');
+
+fprintf(f, 'Report by S-PLACE Toolkit.');
+
+fclose(f);
+winopen('Senosrs_report.txt');
