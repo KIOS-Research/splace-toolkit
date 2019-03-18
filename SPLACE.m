@@ -799,7 +799,9 @@ function LinksID_Callback(hObject, eventdata, handles)
 
 % Hint: get(hObject,'Value') returns toggle state of LinksID
 
-    delete(findall(handles.axes1,'Type','text'))    
+    if ~isempty(findall(handles.axes1,'Type','text'))
+        delete(findall(handles.axes1,'Type','text'))
+    end
     value=get(handles.LinksID,'Value');
     FontSize = str2num(get(handles.FontsizeENplot,'String'));
     if ~length(FontSize) || FontSize<0 || FontSize>30 || FontSize==0
@@ -832,7 +834,10 @@ function NodesID_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 % Hint: get(hObject,'Value') returns toggle state of NodesID
-    delete(findall(handles.axes1,'Type','text'))
+
+    if ~isempty(findall(handles.axes1,'Type','text'))
+        delete(findall(handles.axes1,'Type','text'))
+    end
     value=get(handles.NodesID,'Value');
     FontSize = str2num(get(handles.FontsizeENplot,'String'));
     if  ~length(FontSize) || FontSize<0 || FontSize>30 || FontSize==0
