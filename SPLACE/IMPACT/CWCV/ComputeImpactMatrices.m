@@ -59,7 +59,7 @@ function ComputeImpactMatrices(varargin)
         if exist([pathname,file0,'.c',num2str(i)])==2
             try
                 load([pathname,file0,'.c',num2str(i)],'-mat')
-            catch err
+            catch 
                 break
             end
             
@@ -81,10 +81,8 @@ function ComputeImpactMatrices(varargin)
                 end
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
                 if isstruct(varargin{1}) 
-                    if mod(pp,100)==1
-                        nload=pp/(totalscenarios); 
-                        progressbar(nload)
-                    end
+                    nload=pp/(totalscenarios); 
+                    progressbar(nload)
                     pp=pp+1;
                 end 
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%  

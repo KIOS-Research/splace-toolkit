@@ -16,7 +16,6 @@ function EvolutionaryOptimization(varargin)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     if isstruct(varargin{1}) 
         file0=varargin{1}.file0;
-%         solutionMethod=varargin{1}.pp.solutionMethod; % 0 is exhaustive, 1 is evolutionary based
         PopulationSize_Data=varargin{1}.pp.PopulationSize_Data;
         ParetoFraction_Data=varargin{1}.pp.ParetoFraction_Data;
         Generations_Data=varargin{1}.pp.Generations_Data;
@@ -24,8 +23,6 @@ function EvolutionaryOptimization(varargin)
         load([pwd,'\RESULTS\','pathname.File'],'pathname','-mat');
     else
         file0=varargin{1};
-        %numberOfSensors=1:B.NodeCount; 
-%         solutionMethod=0; % 0 is exhaustive, 1 is evolutionary based
         PopulationSize_Data=1000;
         ParetoFraction_Data=0.7;
         Generations_Data=100;
@@ -36,7 +33,6 @@ function EvolutionaryOptimization(varargin)
     load([pathname,file0,'.0'],'-mat');
     load([pathname,file0,'.w'],'-mat');
     
-%     disp('Solve Sensor Placement')
     if exist('gamultiobj','file')==2
         Y.x=[];
         Y.F=[];u=1;

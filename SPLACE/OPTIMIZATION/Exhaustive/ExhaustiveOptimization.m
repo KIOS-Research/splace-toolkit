@@ -21,8 +21,6 @@ function ExhaustiveOptimization(varargin)
     else
         file0=varargin{1};
         numberOfSensors=varargin{2};%         numberOfSensors=1:5;
-%         B=varargin{3};%         numberOfSensors=1:5;
-%         P=varargin{4};%         numberOfSensors=1:5;
         pathname=[pwd,'\RESULTS\'];
     end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -53,10 +51,8 @@ function ExhaustiveOptimization(varargin)
         for i=1:size(population,1)
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             if isstruct(varargin{1}) 
-                if mod(pp,100)==1
-                    nload=pp/total;
-                    progressbar(nload);
-                end
+                nload=pp/total;
+                progressbar(nload);
                 pp=pp+1;
             end
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -64,19 +60,6 @@ function ExhaustiveOptimization(varargin)
         end
         PS{j}=paretofront(score);
 
-        %mean2=0;
-        %max2=0;
-        %numberCombinations = nchoosek(length(1:B.NodeCount),j);
-        %X=combnk(1:B.NodeCount,j);
-        %tic
-        %for i=1:size(X,1)
-            % THIS TAKES SOME TIME TO CALCULATE for each scenario
-       %     mean2(i)=mean(min(W{1}(:,X(i,:)),[],2));
-       %     max2(i)=max(min(W{1}(:,X(i,:)),[],2));
-       % end
-       % y=[mean2; max2]';
-       % PS{j}=paretofront(y);
-       % toc;
         %because the pareto front does not return solutions with
         %the same values
         tmp=find(PS{j}==1);
@@ -103,6 +86,7 @@ function ExhaustiveOptimization(varargin)
     if isstruct(varargin{1}) 
         progressbar(1);
     end
+    disp('Run was succesfull.')
     %%%%%%%%%%%%%%%%
 end
 

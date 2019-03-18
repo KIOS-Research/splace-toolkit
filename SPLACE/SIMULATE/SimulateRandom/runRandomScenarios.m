@@ -16,16 +16,12 @@ function [P]=runRandomScenarios(varargin)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     if isstruct(varargin{1}) 
         file0=varargin{1}.file0;
-%         T=varargin{1}.T;
         EditNofSce=varargin{1}.EditNofSce;
-%         binary_file = varargin{1}.binary_file;
     else
         B=varargin{1};
         P=varargin{2};
         file0=varargin{3};
         EditNofSce=varargin{4};
-%         T=100; %save every 1000 scenarios
-%         binary_file = varargin{2};
     end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -33,8 +29,6 @@ function [P]=runRandomScenarios(varargin)
 
     load([pathname,file0,'.0'],'-mat')
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    %P.ScenariosContamIndex=P.ScenariosContamIndex(1:EditNofSce/size(P.ScenariosFlowIndex,1),:);
-%     P.ScenariosContamIndex=P.ScenariosContamIndex(randi(size(P.ScenariosContamIndex,1),EditNofSce,1),:);
     P.ScenariosFlowIndex=P.ScenariosFlowIndex(randi(size(P.ScenariosFlowIndex,1),size(P.ScenariosFlowIndex,1),1),:);
     P.ScenariosContamIndex=P.ScenariosContamIndex(randi(size(P.ScenariosContamIndex,1),(EditNofSce)/(size(P.ScenariosFlowIndex,1)),1),:);
     a=mod((EditNofSce),(size(P.ScenariosFlowIndex,1)));
@@ -48,7 +42,6 @@ function [P]=runRandomScenarios(varargin)
     
     B.setTimeSimulationDuration(P.SimulationTime*3600);
 
-%     disp('Create Hydraulic files')
     for i=1:size(P.ScenariosFlowIndex,1)
         B.setLinkDiameter(P.FlowParamScenarios{1}(:, P.ScenariosFlowIndex(i,1))')
         B.setLinkLength(P.FlowParamScenarios{2}(:, P.ScenariosFlowIndex(i,2))')
@@ -63,13 +56,8 @@ function [P]=runRandomScenarios(varargin)
         else
             B.setPatternMatrix(P.FlowParamScenarios{6}(:,:,P.ScenariosFlowIndex(i,6))')
         end
-%         if ~binary_file
-%             B.solveCompleteHydraulics;
-%             B.saveHydraulicFile([pathname,file0,'.h',num2str(i)]);
-%         end
     end
     
-%     disp('Create Quality files')
     pstep=P.PatternTimeStep;
     B.setTimeQualityStep(pstep);
     zeroNodes=zeros(1,B.NodeCount);
@@ -79,9 +67,7 @@ function [P]=runRandomScenarios(varargin)
     patlen=(P.SimulationTime)*3600/pstep;
     sizeflowscenarios=size(P.ScenariosFlowIndex,1);
     sizecontscenarios=size(P.ScenariosContamIndex,1);
-%     disp(['Hydraulic Scenarios: ', num2str(sizeflowscenarios), ', Quality Scenarios:',num2str(sizecontscenarios)])
 
-%     SensingNodeIndices_NodeBaseDemands=unique([find(P.SensingNodeIndices),find(B.NodeBaseDemands)]);
     SensingNodeIndices_NodeBaseDemands=unique([find(P.SensingNodeIndices),find(B.NodeBaseDemands{1})]);
     
     l=0;
@@ -97,25 +83,17 @@ function [P]=runRandomScenarios(varargin)
             disp(['Hydraulic Scenario ',num2str(l)])
             st2=0;
             avtime=inf;
-%             if ~binary_file
-%                 tmphydfile=[pathname,file0,'.h',num2str(l)];
-%                 B.useHydraulicFile(tmphydfile);
-%                 D{l}=B.getComputedQualityTimeSeries('time','demandSensingNodes',SensingNodeIndices_NodeBaseDemands);
-%             else
             res = B.getComputedTimeSeries;
             D{l}.DemandSensingNodes = res.Demand(:, SensingNodeIndices_NodeBaseDemands);
             D{l}.Time = res.Time;
             D{l}.SensingNodesIndices = SensingNodeIndices_NodeBaseDemands;
-%             end
             i=1;
         end
         
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         if isstruct(varargin{1}) 
-%             if mod(pp,100)==1
-                nload=pp/(sizeflowscenarios*sizecontscenarios); 
-                progressbar(nload)
-%             end
+            nload=pp/(sizeflowscenarios*sizecontscenarios); 
+            progressbar(nload)
             pp=pp+1;
         end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -139,28 +117,20 @@ function [P]=runRandomScenarios(varargin)
             B.setNodeSourceQuality(tmp2)
         end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%         if ~binary_file
-%             C{k}=B.getComputedQualityTimeSeries('qualitySensingNodes',SensingNodeIndices_NodeBaseDemands);
-%         else
         res = B.getComputedTimeSeries;
         C{k}.QualitySensingNodes = res.NodeQuality(:, SensingNodeIndices_NodeBaseDemands);
         C{k}.SensingNodesIndices = SensingNodeIndices_NodeBaseDemands;
-%         end
         d(k)=l;
         t2=toc(t1);
         disp(['[Scenario]: ',num2str(i)])
         st2=st2+t2;
         avtime=st2/i;
         i=i+1;  
-%         if mod(j,T)==0;
-            save([pathname,file0,'.c',num2str(t0)],'C','t0','d','-mat');
-            t0=t0+1;
-            clear C;
-            clear d;
-            k=1;
-%         else
-%             k=k+1;
-%         end
+        save([pathname,file0,'.c',num2str(t0)],'C','t0','d','-mat');
+        t0=t0+1;
+        clear C;
+        clear d;
+        k=1;
     end
     try
         save([pathname,file0,'.c',num2str(t0)],'C','t0','d','-mat');
