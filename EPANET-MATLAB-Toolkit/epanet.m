@@ -8179,7 +8179,7 @@ if strcmpi(slegend, 'show')
         legendString={'Pipes', 'Pumps', 'Valves', ...
             'Junctions', 'Reservoirs', 'Tanks'}; 
         legendIndices=sort(legendIndices, 'descend');
-        legend(h(legendIndices), legendString(legendIndices), 'Location', legendposition);
+        legend(h(legendIndices), legendString(legendIndices), 'Location', legendposition, 'AutoUpdate', 'off');
     end
 elseif strcmpi(slegend, 'hide')
     %skip
