@@ -167,6 +167,9 @@ function [P]=runRandomScenarios(varargin)
         clear C;
     catch
     end
+    if isstruct(varargin{1}) 
+        progressbar(1);
+    end
     P.newTotalofScenarios=EditNofSce;
     save([pathname,file0,'.0'],'P','B','-mat');
     save([pathname,file0,'.c0'],'D','l','t0', '-mat');    

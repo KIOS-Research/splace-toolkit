@@ -50,6 +50,9 @@ function ComputeImpactMatrices(varargin)
         demand{i}(:,find(P.SensingNodeIndices))=D{i}.DemandSensingNodes(:,b);
         demand{i}(find(demand{i}<0))=0;
     end
+    if isstruct(varargin{1}) 
+        progressbar('Compute Impact Matrix...')
+    end
     
     l=0;pp=1;
     for i=1:t0
@@ -73,22 +76,21 @@ function ComputeImpactMatrices(varargin)
                 detectionNodes=find(sum(c1));
                 cwv=c1.*Dt.*demand{d(k)}; %D{d(k)}.Demand.*Dt;
                 for j=detectionNodes
-                    [a tmp]=max(c1(:,j));
+                    [~, tmp]=max(c1(:,j));
                     W{1}(l,j)=sum(sum(cwv(1:tmp,1:B.NodeJunctionCount)));%B.NodeCount
                 end
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
                 if isstruct(varargin{1}) 
                     if mod(pp,100)==1
                         nload=pp/(totalscenarios); 
-                        varargin{1}.color=char('red');
-                        progressbar(varargin{1},nload)
+                        progressbar(nload)
                     end
                     pp=pp+1;
                 end 
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%  
                 try
                     W{1}(l,find(W{1}(l,:)==inf))=sum(sum(cwv(1:size(cwv,1),1:B.NodeJunctionCount))); 
-                catch err
+                catch
                 end
             end
             clear C;
@@ -96,4 +98,8 @@ function ComputeImpactMatrices(varargin)
             save([pathname,file0,'.w'],'W', 'IM', '-mat');
         end
     end
+    if isstruct(varargin{1}) 
+        progressbar(1);
+    end
+    disp('Run was succesfull.')
 end

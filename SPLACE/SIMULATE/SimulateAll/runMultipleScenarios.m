@@ -151,6 +151,9 @@ function runMultipleScenarios(varargin)
         clear C;
     catch
     end
+    if isstruct(varargin{1}) 
+        progressbar(1);
+    end
     save([pathname,file0,'.c0'],'D','l','t0', '-mat');
     SimulateMethod='grid';
     save([pathname,'Simulate.Method'],'SimulateMethod','-mat');

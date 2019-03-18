@@ -116,21 +116,20 @@ function start_Callback(hObject, eventdata, handles)
     
     set(handles.start,'enable','off');
     set(handles.load,'enable','off');
-%     handles.binary_file = 1;%get(handles.checkbox1, 'Value');
-
     runMultipleScenarios(handles)
-    %if libisloaded('epanet2')
-    %    unloadlibrary('epanet2');
-    %end
-    %handles.B=epanet(handles.B.InputFile);clc;
-    pause(0.1);
-    close;
+    try
+        close(findobj('type','figure','name','Simulate All Scenarios'))
+    catch
+    end
 
-    load([pwd,'\RESULTS\','ComWind.messsages'],'msg','-mat');
-    msg=[msg;{'>>Create Hydraulic and Quality files.'}];
-    set(handles.LoadText,'String',msg);
-    set(handles.LoadText,'Value',length(msg)); 
-    save([pwd,'\RESULTS\','ComWind.messsages'],'msg','-mat');
+    try
+        load([pwd,'\RESULTS\','ComWind.messsages'],'msg','-mat');
+        msg=[msg;{'>>Create Hydraulic and Quality files.'}];
+        set(handles.LoadText,'String',msg);
+        set(handles.LoadText,'Value',length(msg)); 
+        save([pwd,'\RESULTS\','ComWind.messsages'],'msg','-mat');
+    catch
+    end
 %     set(handles.runMultipleScenarios,'enable','off');
 
     % --- Executes on button press in load.

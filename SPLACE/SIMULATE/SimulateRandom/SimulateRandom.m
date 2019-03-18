@@ -122,23 +122,22 @@ function start_Callback(hObject, eventdata, handles)
     
     set(handles.start,'enable','off');
     set(handles.load,'enable','off');
-%     handles.binary_file = 1;%get(handles.checkbox1, 'Value');
         
     runRandomScenarios(handles);
-%     if libisloaded('epanet2')
-%         unloadlibrary('epanet2');
-%     end
-%     handles.B=epanet(handles.B.InputFile);clc;
-    pause(0.1);
-    close;
-
-    load([pwd,'\RESULTS\','ComWind.messsages'],'msg','-mat');
-    msg=[msg;{'>>Create Hydraulic and Quality files.'}];
-    set(handles.LoadText,'String',msg);
-    set(handles.LoadText,'Value',length(msg)); 
-    save([pwd,'\RESULTS\','ComWind.messsages'],'msg','-mat');
-%     set(handles.runMultipleScenarios,'enable','off');
-        
+    try
+        close(findobj('type','figure','name','Simulate Random Scenarios'))
+    catch
+    end
+    
+    try
+        load([pwd,'\RESULTS\','ComWind.messsages'],'msg','-mat');
+        msg=[msg;{'>>Create Hydraulic and Quality files.'}];
+        set(handles.LoadText,'String',msg);
+        set(handles.LoadText,'Value',length(msg)); 
+        save([pwd,'\RESULTS\','ComWind.messsages'],'msg','-mat');
+    catch
+    end
+    
 % --- Executes on button press in load.
 function load_Callback(hObject, eventdata, handles)
 % hObject    handle to load (see GCBO)
