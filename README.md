@@ -32,6 +32,10 @@ The `Sensor Placement (S-PLACE) Toolkit' is used for computing at which location
 
 * Eliades, D. G., Kyriakou, M., and Polycarpou, M. M. (2014). Sensor placement in water distribution systems using the S-PLACE Toolkit. Proc12th International Conference on Computing and Control for the Water Industry, CCWI2013, Procedia Engineering, Elsevier, 70, pp. 602-611. (https://doi.org/10.1016/j.proeng.2014.02.066)
 
+Mathematical Framework
+* Eliades, D., Polycarpou, M., 2010. A fault diagnosis and security framework for water systems. IEEE Transactions on Control Systems Technology
+18, 1254�1265. [ref](http://ieeexplore.ieee.org/xpl/articleDetails.jsp?tp=&arnumber=5350461)
+
 &uparrow; [Back to top](#table-of-contents)
 
 ## Requirements
