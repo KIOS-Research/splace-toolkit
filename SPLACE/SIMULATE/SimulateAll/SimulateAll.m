@@ -67,12 +67,12 @@ function SimulateAll_OpeningFcn(hObject, eventdata, handles, varargin)
 
     if ~strcmp(handles.B.InputFile,B.InputFile)
         set(handles.start,'enable','off');
-%         set(handles.SaveEveryScenarios,'enable','off');
+        set(handles.SaveEveryScenarios,'enable','off');
         %set(handles.EditNumberOfScenarios,'enable','off');
         set(handles.FileText,'String','')
     else
         set(handles.start,'enable','on');
-%         set(handles.SaveEveryScenarios,'enable','on');
+        set(handles.SaveEveryScenarios,'enable','on');
         %set(handles.EditNumberOfScenarios,'enable','on');
         set(handles.FileText,'String',[handles.file0,'.0'])
         T=100;%SaveEvreyScenarios
@@ -80,7 +80,7 @@ function SimulateAll_OpeningFcn(hObject, eventdata, handles, varargin)
         if T>handles.TotalNofSce
             T=handles.TotalNofSce;
         end
-%         set(handles.SaveEveryScenarios,'String',T);
+        set(handles.SaveEveryScenarios,'String',T);
         set(handles.TotalScenarios,'String',handles.TotalNofSce);
         %set(handles.EditNumberOfScenarios,'String',handles.TotalNofSce);
     end
@@ -108,15 +108,16 @@ function start_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-%     handles.T=str2num(get(handles.SaveEveryScenarios, 'String'));
-%     if  ~length(handles.T) || handles.T<0 || handles.T>handles.TotalNofSce
-%         msgbox('  Give number of save every scenarios', 'Error', 'modal')
-%         return
-%     end
+    handles.T=str2num(get(handles.SaveEveryScenarios, 'String'));
+    if  ~length(handles.T) || handles.T<0 || handles.T>handles.TotalNofSce
+        msgbox('  Give number of save every scenarios', 'Error', 'modal')
+        return
+    end
     
     set(handles.start,'enable','off');
     set(handles.load,'enable','off');
     runMultipleScenarios(handles)
+    handles.B.loadEPANETFile(handles.B.BinTempfile);clc;
     try
         close(findobj('type','figure','name','Simulate All Scenarios'))
     catch
@@ -155,7 +156,7 @@ function load_Callback(hObject, eventdata, handles)
         if ~strcmp(handles.B.InputFile,B.InputFile)
             set(handles.start,'enable','off');
             %set(handles.EditNumberOfScenarios,'enable','off');
-%             set(handles.SaveEveryScenarios,'enable','off');
+            set(handles.SaveEveryScenarios,'enable','off');
             load([pwd,'\RESULTS\','ComWind.messsages'],'msg','-mat');
             msg=[msg;{['>>Wrong File0 "',file0,'"']}];
             set(handles.LoadText,'String',msg);
@@ -165,13 +166,13 @@ function load_Callback(hObject, eventdata, handles)
         else
             set(handles.start,'enable','on');
             %set(handles.EditNumberOfScenarios,'enable','on');
-%             set(handles.SaveEveryScenarios,'enable','on');
+            set(handles.SaveEveryScenarios,'enable','on');
             T=100;%SaveEvreyScenarios
             handles.TotalNofSce=P.TotalScenarios;
             if T>handles.TotalNofSce
                 T=handles.TotalNofSce;
             end
-%             set(handles.SaveEveryScenarios,'String',T);
+            set(handles.SaveEveryScenarios,'String',T);
             set(handles.FileText,'String',[handles.file0,'.0'])
             set(handles.TotalScenarios,'String',handles.TotalNofSce);
             %set(handles.EditNumberOfScenarios,'String',handles.TotalNofSce);
@@ -244,3 +245,26 @@ function TotalScenarios_CreateFcn(hObject, eventdata, handles)
 
 
 
+
+
+
+function edit6_Callback(hObject, eventdata, handles)
+% hObject    handle to SaveEveryScenarios (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of SaveEveryScenarios as text
+%        str2double(get(hObject,'String')) returns contents of SaveEveryScenarios as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function edit6_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to SaveEveryScenarios (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end

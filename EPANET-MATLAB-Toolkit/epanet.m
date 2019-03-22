@@ -482,7 +482,8 @@ classdef epanet <handle
                 error('Could not open the file, please check INP file.');
             end
             %Save the temporary input file
-            obj.BinTempfile=[obj.InputFile(1:end-4),'_temp.inp'];
+            %obj.BinTempfile=[obj.InputFile(1:end-4),'_temp.inp'];
+            obj.BinTempfile=['RESULTS/',inp,'_temp.inp'];%only for S-PLACE
             obj.saveInputFile(obj.BinTempfile); %create a new INP file (Working Copy) using the SAVE command of EPANET
             obj.closeNetwork;  %ENclose; %Close input file
             %Load temporary file
@@ -2152,41 +2153,8 @@ classdef epanet <handle
             obj.closeQualityAnalysis;
         end
         function value = getComputedTimeSeries(obj)
-            cnt = obj.getNodeCount;
-            LinkNodesIndex = unique(obj.getLinkNodesIndex);
-            if (length(LinkNodesIndex)~=cnt)
-                lenLinkNodes = [LinkNodesIndex; zeros(cnt-length(LinkNodesIndex),1)];
-                value =[];
-                fIndex = setdiff(obj.getNodeIndex,lenLinkNodes);
-                for i=fIndex
-                    disp(['Input Error 233: Node ',obj.getNodeNameID{i},' is unconnected.']);  
-                end
-                return;
-            end
-            obj.saveInputFile(obj.BinTempfile);
-            [~, rptfile, binfile]= createTempfiles(obj.BinTempfile);
-            obj.loadEPANETFile(obj.BinTempfile);
-            obj.Errcode=calllib(obj.LibEPANET,'ENepanet',obj.BinTempfile,rptfile,binfile,lib.pointer);
-            if sum(obj.Errcode==[302,303])
-                while obj.Errcode %fix this error
-                    ENMatlabCleanup(obj.LibEPANET);
-                    ENLoadLibrary(obj.LibEPANETpath,obj.LibEPANET,0);
-                    obj.Errcode=calllib(obj.LibEPANET,'ENepanet',obj.BinTempfile,rptfile,binfile,lib.pointer);
-                end
-            elseif ~sum(obj.Errcode==[0,1,2,3,4,5,6])
-                disp(obj.getError(obj.Errcode));
-                obj.loadEPANETFile(obj.BinTempfile);
-                value = obj.getComputedHydraulicTimeSeries;
-                v = obj.getComputedQualityTimeSeries; 
-                value.LinkQuality = v.LinkQuality;
-                value.NodeQuality = v.NodeQuality;
-                value.MassFlowRate = v.MassFlowRate;
-                return;
-            end
-                
-            fid = fopen(binfile,'r');            
+            [fid,binfile,rptfile] = runEPANETexe(obj);            
             value = readEpanetBin(fid,binfile,rptfile,0);
-            obj.loadEPANETFile(obj.BinTempfile);
         end
         function value = getUnits(obj)
             % Retrieves the Units of Measurement
@@ -7901,9 +7869,9 @@ for i=1:(nargin/2)
             error('Invalid property founobj.');
     end
 end
-drawnow;
 
 if axesid==0
+   drawnow;
    fig=figure;
    axesid=axes('Parent', fig);
 end
@@ -8179,7 +8147,11 @@ if strcmpi(slegend, 'show')
         legendString={'Pipes', 'Pumps', 'Valves', ...
             'Junctions', 'Reservoirs', 'Tanks'}; 
         legendIndices=sort(legendIndices, 'descend');
-        legend(h(legendIndices), legendString(legendIndices), 'Location', legendposition, 'AutoUpdate', 'off');
+        try
+            legend(h(legendIndices), legendString(legendIndices), 'Location', legendposition, 'AutoUpdate', 'off');
+        catch
+            legend(h(legendIndices), legendString(legendIndices), 'Location', legendposition);
+        end
     end
 elseif strcmpi(slegend, 'hide')
     %skip
@@ -11204,18 +11176,18 @@ function value = readEpanetBin(fid, binfile, rptfile, varargin)
         fread(fid, 1, 'float');
 
         for i=1:value.BinNumberReportingPeriods
-            value.BinnodeDemand(i,:)         = fread(fid, value.BinNumberNodes, 'float')';
-            value.BinnodeHead(i,:)           = fread(fid, value.BinNumberNodes, 'float')';
-            value.BinnodePressure(i,:)       = fread(fid, value.BinNumberNodes, 'float')';
-            value.BinnodeQuality(i,:)        = fread(fid, value.BinNumberNodes, 'float')';
-            value.BinlinkFlow(i,:)           = fread(fid, value.BinNumberLinks, 'float')';
-            value.BinlinkVelocity(i,:)       = fread(fid, value.BinNumberLinks, 'float')';
-            value.BinlinkHeadloss(i,:)       = fread(fid, value.BinNumberLinks, 'float')';
-            value.BinlinkQuality(i,:)        = fread(fid, value.BinNumberLinks, 'float')';
-            value.BinlinkStatus(i,:)         = fread(fid, value.BinNumberLinks, 'float')';
-            value.BinlinkSetting(i,:)        = fread(fid, value.BinNumberLinks, 'float')';
-            value.BinlinkReactionRate(i,:)   = fread(fid, value.BinNumberLinks, 'float')';
-            value.BinlinkFrictionFactor(i,:) = fread(fid, value.BinNumberLinks, 'float')';
+            value.BinNodeDemand(i,:)         = fread(fid, value.BinNumberNodes, 'float')';
+            value.BinNodeHead(i,:)           = fread(fid, value.BinNumberNodes, 'float')';
+            value.BinNodePressure(i,:)       = fread(fid, value.BinNumberNodes, 'float')';
+            value.BinNodeQuality(i,:)        = fread(fid, value.BinNumberNodes, 'float')';
+            value.BinLinkFlow(i,:)           = fread(fid, value.BinNumberLinks, 'float')';
+            value.BinLinkVelocity(i,:)       = fread(fid, value.BinNumberLinks, 'float')';
+            value.BinLinkHeadloss(i,:)       = fread(fid, value.BinNumberLinks, 'float')';
+            value.BinLinkQuality(i,:)        = fread(fid, value.BinNumberLinks, 'float')';
+            value.BinLinkStatus(i,:)         = fread(fid, value.BinNumberLinks, 'float')';
+            value.BinLinkSetting(i,:)        = fread(fid, value.BinNumberLinks, 'float')';
+            value.BinLinkReactionRate(i,:)   = fread(fid, value.BinNumberLinks, 'float')';
+            value.BinLinkFrictionFactor(i,:) = fread(fid, value.BinNumberLinks, 'float')';
         end
         value.BinAverageBulkReactionRate=fread(fid, 1, 'float')';
         value.BinAverageWallReactionRate=fread(fid, 1, 'float')';
@@ -11227,18 +11199,18 @@ function value = readEpanetBin(fid, binfile, rptfile, varargin)
     end
     if ~isempty(varargin)
         v.Time = (0:value.BinReportingTimeStepSec:value.BinSimulationDurationSec)';
-        v.Pressure = value.BinnodePressure;
-        v.Demand = value.BinnodeDemand;
-        v.Head = value.BinnodeHead;
-        v.NodeQuality = value.BinnodeQuality;
-        v.Flow = value.BinlinkFlow;
-        v.Velocity = value.BinlinkVelocity;
-        v.HeadLoss = value.BinlinkHeadloss;
-        v.Status = value.BinlinkStatus;
-        v.Setting = value.BinlinkSetting;
-        v.ReactionRate = value.BinlinkReactionRate;
-        v.FrictionFactor = value.BinlinkFrictionFactor;
-        v.LinkQuality = value.BinlinkQuality;
+        v.Pressure = value.BinNodePressure;
+        v.Demand = value.BinNodeDemand;
+        v.Head = value.BinNodeHead;
+        v.NodeQuality = value.BinNodeQuality;
+        v.Flow = value.BinLinkFlow;
+        v.Velocity = value.BinLinkVelocity;
+        v.HeadLoss = value.BinLinkHeadloss;
+        v.Status = value.BinLinkStatus;
+        v.Setting = value.BinLinkSetting;
+        v.ReactionRate = value.BinLinkReactionRate;
+        v.FrictionFactor = value.BinLinkFrictionFactor;
+        v.LinkQuality = value.BinLinkQuality;
         clear value;
         value=v;
     end

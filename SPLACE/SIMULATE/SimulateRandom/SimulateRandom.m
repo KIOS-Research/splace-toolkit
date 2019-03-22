@@ -67,12 +67,12 @@ function SimulateRandom_OpeningFcn(hObject, eventdata, handles, varargin)
 
     if ~strcmp(handles.B.InputFile,B.InputFile)
         set(handles.start,'enable','off');
-%         set(handles.SaveEveryScenarios,'enable','off');
+        set(handles.SaveEveryScenarios,'enable','off');
         set(handles.EditNumberOfScenarios,'enable','off');
         set(handles.FileText,'String','')
     else
         set(handles.start,'enable','on');
-%         set(handles.SaveEveryScenarios,'enable','on');
+        set(handles.SaveEveryScenarios,'enable','on');
         set(handles.EditNumberOfScenarios,'enable','on');
         set(handles.FileText,'String',[handles.file0,'.0'])
         T=100;%SaveEvreyScenarios
@@ -80,7 +80,7 @@ function SimulateRandom_OpeningFcn(hObject, eventdata, handles, varargin)
         if T>handles.TotalNofSce
             T=handles.TotalNofSce;
         end
-%         set(handles.SaveEveryScenarios,'String',T);
+        set(handles.SaveEveryScenarios,'String',T);
         set(handles.TotalScenarios,'String',handles.TotalNofSce);
         set(handles.EditNumberOfScenarios,'String',round(handles.TotalNofSce/10));
     end
@@ -108,11 +108,11 @@ function start_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-%     handles.T=str2num(get(handles.SaveEveryScenarios, 'String'));
-%     if  ~length(handles.T) || handles.T<0 || handles.T>handles.TotalNofSce
-%         msgbox('  Give number of save every scenarios', 'Error', 'modal')
-%         return
-%     end
+    handles.T=str2num(get(handles.SaveEveryScenarios, 'String'));
+    if  ~length(handles.T) || handles.T<0 || handles.T>handles.TotalNofSce
+        msgbox('  Give number of save every scenarios', 'Error', 'modal')
+        return
+    end
     
     handles.EditNofSce=str2num(get(handles.EditNumberOfScenarios, 'String'));
     if  ~length(handles.EditNofSce) || handles.EditNofSce<0 || handles.EditNofSce>handles.TotalNofSce
@@ -160,7 +160,7 @@ function load_Callback(hObject, eventdata, handles)
         if ~strcmp(handles.B.InputFile,B.InputFile)
             set(handles.start,'enable','off');
             set(handles.EditNumberOfScenarios,'enable','off');
-%             set(handles.SaveEveryScenarios,'enable','off');
+            set(handles.SaveEveryScenarios,'enable','off');
             load([pwd,'\RESULTS\','ComWind.messsages'],'msg','-mat');
             msg=[msg;{['>>Wrong File0 "',file0,'"']}];
             set(handles.LoadText,'String',msg);
@@ -170,13 +170,13 @@ function load_Callback(hObject, eventdata, handles)
         else
             set(handles.start,'enable','on');
             set(handles.EditNumberOfScenarios,'enable','on');
-%             set(handles.SaveEveryScenarios,'enable','on');
+            set(handles.SaveEveryScenarios,'enable','on');
             T=100;%SaveEvreyScenarios
             handles.TotalNofSce=P.TotalScenarios;
             if T>handles.TotalNofSce
                 T=handles.TotalNofSce;
             end
-%             set(handles.SaveEveryScenarios,'String',T);
+            set(handles.SaveEveryScenarios,'String',T);
             set(handles.FileText,'String',[handles.file0,'.0'])
             set(handles.TotalScenarios,'String',handles.TotalNofSce);
             set(handles.EditNumberOfScenarios,'String',round(handles.TotalNofSce/10));

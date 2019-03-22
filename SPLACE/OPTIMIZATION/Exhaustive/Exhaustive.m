@@ -236,13 +236,12 @@ function Solve_Callback(hObject, eventdata, handles)
         end
         i=i+1;pp=pp+1;
     end
-    
-    msg=[msg;{'>>Sensor solutions.'}];
+   
+    msg=[msg;{'>>Exhaustive algorithm was succesfull.'}];
     set(handles.LoadText,'String',msg);
     set(handles.LoadText,'Value',length(msg)); 
     save([pwd,'\RESULTS\','ComWind.messsages'],'msg','-mat');
     save([pwd,'\RESULTS\','w.report'],'w','-mat');
-    msgbox('Exhaustive algorithm was succesfull.','Success','modal')
     set(handles.export_sensors,'visible','on');
 
     

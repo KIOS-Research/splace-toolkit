@@ -340,16 +340,14 @@ function Solve_Callback(hObject, eventdata, handles)
         i=i+1;pp=pp+1;
     end
     
-    msg=[msg;{'>>Sensor solutions.'}];
+    set(handles.export_sensors,'visible','on');
+    msg=[msg;{'>>Evolutionary algorithm was succesfull.'}];
     set(handles.LoadText,'String',msg);
-    set(handles.LoadText,'Value',length(msg));
+    set(handles.LoadText,'Value',length(msg)); 
     save([pwd,'\RESULTS\','w.report'],'w','-mat');
     save([pwd,'\RESULTS\','ComWind.messsages'],'msg','-mat');
     
-    set(handles.export_sensors,'visible','on');
-    msgbox('Evolutionary algorithm was succesfull.','Success','modal')
-
-    
+   
 function [errorCode,pp] = CheckForError(hObject,handles)
     errorCode=0;
     pp.PopulationSize_Data=str2num(get(handles.PopulationSize_Data, 'String'));

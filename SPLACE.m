@@ -243,8 +243,11 @@ function LoadInputFile_Callback(hObject, eventdata, handles)
         set(handles.LoadInputFile,'str','Load Input File','backg',col)  % Now reset the button features.
         % Update handles structure
         guidata(hObject, handles);
-
-%         if findobj('Tag','legend'),delete(findobj('Tag','legend'));end
+           
+        try
+            delete(findobj('Tag','legend'));
+        catch
+        end
         try 
             cla(handles.previousg)
             handles.previousg=axes('Parent',handles.axes1);
@@ -449,10 +452,11 @@ function ComputeImpactMatrix_Callback(hObject, eventdata, handles)
 
     if exist('File0.File','file')==2 
         load([pwd,'\RESULTS\','File0.File'],'-mat');
+        [~, file0, ~] = fileparts(file0);
         if exist([pathname,file0,'.0'],'file')==2
-            [path, name, ext] = fileparts(file0);
+            [~, ~, ext] = fileparts(file0);
         else
-            ext=1;
+            ext=[];
         end
         
         if length(ext)==0
@@ -551,9 +555,9 @@ function SolveSensorPlacement_Callback(hObject, eventdata, handles)
                 else
                     load([pwd,'\RESULTS\','ComWind.messsages'],'msg','-mat');
                     set(handles.LoadText,'Value',1);
-                    msg=[msg;{'>>Cannot find impact matrix.'}];
+                    msg=[msg;{'>>Cannot find impact matrix.**'}];
                     set(handles.LoadText,'String',msg);                    
-                    msg=[msg;{'>>Select Compute Impact Matrix.'}];
+                    msg=[msg;{'>>Select Compute Impact Matrix.**'}];
                     set(handles.LoadText,'String',msg);
                     set(handles.LoadText,'Value',length(msg)); 
                     save([pwd,'\RESULTS\','ComWind.messsages'],'msg','-mat');
@@ -650,7 +654,6 @@ function SplaceTable_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 % Hints: contents = cellstr(get(hObject,'String')) returns SplaceTable contents as cell array
-    
     FontSize = str2num(get(handles.FontsizeENplot,'String'));
     if  ~length(FontSize) || FontSize<0 || FontSize>20
         load([pwd,'\RESULTS\','ComWind.messsages'],'msg','-mat');
@@ -675,10 +678,6 @@ function SplaceTable_Callback(hObject, eventdata, handles)
                     C2='g'; C1='g';
                 elseif sum(IndexID(i)==handles.B.NodeTankIndex)
                     C2='k'; C1='k';
-                end
-                try
-                axes(handles.axes1); 
-                catch
                 end
                 plot(handles.B.NodeCoordinates{1}(IndexID(i)),handles.B.NodeCoordinates{2}(IndexID(i)),'o','LineWidth',2,'MarkerEdgeColor',C1,...
                 'MarkerFaceColor',C2,'MarkerSize',5);

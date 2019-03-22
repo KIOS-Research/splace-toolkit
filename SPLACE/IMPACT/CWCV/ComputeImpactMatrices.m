@@ -31,24 +31,25 @@ function ComputeImpactMatrices(varargin)
     load([pathname,file0,'.c0'],'-mat')
     load([pathname,'Simulate.Method'],'SimulateMethod','-mat');
 
-    sizeflowscenarios=size(P.ScenariosFlowIndex,1);
-    sizecontscenarios=size(P.ScenariosContamIndex,1);
+    sizeflowscenarios = size(P.ScenariosFlowIndex,1);
+    sizecontscenarios = size(P.ScenariosContamIndex,1);
     
     if strcmpi(SimulateMethod,'grid')
-        totalscenarios=sizeflowscenarios*sizecontscenarios;
+        totalscenarios = sizeflowscenarios*sizecontscenarios;
     elseif strcmpi(SimulateMethod,'random')
-        totalscenarios=P.newTotalofScenarios;
+        totalscenarios = P.newTotalofScenarios;
     end
     disp('Compute Impact Matrix')
-    Dt=double(B.TimeHydraulicStep)/60; % time step in minutes
-    T=inf*ones(sizeflowscenarios*sizecontscenarios,B.NodeCount);
-    W{1}=inf*ones(totalscenarios,B.NodeCount);
+    Dt = double(B.TimeHydraulicStep)/60; % time step in minutes
+    T = inf*ones(sizeflowscenarios*sizecontscenarios, B.NodeCount);
+    W{1} = inf*ones(totalscenarios, B.NodeCount);
     %W{2}=inf*ones(sizeflowscenarios*sizecontscenarios,B.NodeCount);
     for i=1:length(D)
-        demand{i}=zeros(size(D{1}.DemandSensingNodes,1),B.NodeCount);
-        [~,b]=intersect(D{i}.SensingNodesIndices,find(P.SensingNodeIndices));
-        demand{i}(:,find(P.SensingNodeIndices))=D{i}.DemandSensingNodes(:,b);
-        demand{i}(find(demand{i}<0))=0;
+        demand{i} = zeros(size(D{1}.DemandSensingNodes,1), B.NodeCount);
+        find_sens_ind = find(P.SensingNodeIndices);
+        [~,b] = intersect(D{i}.SensingNodesIndices, find_sens_ind);
+        demand{i}(:, find_sens_ind) = D{i}.DemandSensingNodes(:,b);
+        demand{i}(find(demand{i}<0)) = 0;
     end
     if isstruct(varargin{1}) 
         progressbar('Compute Impact Matrix...')
@@ -56,16 +57,14 @@ function ComputeImpactMatrices(varargin)
     
     l=0;pp=1;
     for i=1:t0
-        if exist([pathname,file0,'.c',num2str(i)])==2
+        if exist([pathname, file0, '.c',num2str(i)])==2
             try
-                load([pathname,file0,'.c',num2str(i)],'-mat')
+                load([pathname, file0, '.c',num2str(i)], '-mat')
             catch 
                 break
             end
             
-            for k=1:size(C,2)
-                %[~,b]=intersect(D{i}.SensingNodesIndices,find(P.SensingNodeIndices));
-
+            for k=1:size(C, 2)
                 c=C{k}.QualitySensingNodes(:,b);   
                 c1=zeros(size(C{k}.QualitySensingNodes,1),B.NodeCount);
                 l=l+1;
@@ -74,10 +73,10 @@ function ComputeImpactMatrices(varargin)
                 c1(find(c1<=IM{1}.SensorThreshold))=0;
                 c1(find(c1>IM{1}.SensorThreshold))=1;
                 detectionNodes=find(sum(c1));
-                cwv=c1.*Dt.*demand{d(k)}; %D{d(k)}.Demand.*Dt;
+                cwv = c1.*Dt.*demand{d(k)}; %D{d(k)}.Demand.*Dt;
                 for j=detectionNodes
-                    [~, tmp]=max(c1(:,j));
-                    W{1}(l,j)=sum(sum(cwv(1:tmp,1:B.NodeJunctionCount)));%B.NodeCount
+                    [~, tmp] = max(c1(:,j));
+                    W{1}(l,j) = sum(sum(cwv(1:tmp,1:B.NodeJunctionCount)));%B.NodeCount
                 end
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
                 if isstruct(varargin{1}) 
@@ -87,12 +86,12 @@ function ComputeImpactMatrices(varargin)
                 end 
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%  
                 try
-                    W{1}(l,find(W{1}(l,:)==inf))=sum(sum(cwv(1:size(cwv,1),1:B.NodeJunctionCount))); 
+                    W{1}(l,find(W{1}(l,:) == inf)) = sum(sum(cwv(1:size(cwv,1),1:B.NodeJunctionCount))); 
                 catch
                 end
             end
             clear C;
-            W{1}(:,P.SensingNodeIndices==0)=0;
+            W{1}(:,P.SensingNodeIndices==0) = 0;
             save([pathname,file0,'.w'],'W', 'IM', '-mat');
         end
     end

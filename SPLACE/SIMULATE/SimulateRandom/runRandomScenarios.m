@@ -17,11 +17,13 @@ function [P]=runRandomScenarios(varargin)
     if isstruct(varargin{1}) 
         file0=varargin{1}.file0;
         EditNofSce=varargin{1}.EditNofSce;
+        T=varargin{1}.T;
     else
         B=varargin{1};
         P=varargin{2};
         file0=varargin{3};
         EditNofSce=varargin{4};
+        T=100; %save every 1000 scenarios
     end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -80,13 +82,12 @@ function [P]=runRandomScenarios(varargin)
         t1=tic;
         if mod(j,sizecontscenarios)==1
             l=l+1;
+            tmphydfile=[pathname,file0,'.h',num2str(l)];
+            B.useHydraulicFile(tmphydfile);
             disp(['Hydraulic Scenario ',num2str(l)])
             st2=0;
             avtime=inf;
-            res = B.getComputedTimeSeries;
-            D{l}.DemandSensingNodes = res.Demand(:, SensingNodeIndices_NodeBaseDemands);
-            D{l}.Time = res.Time;
-            D{l}.SensingNodesIndices = SensingNodeIndices_NodeBaseDemands;
+            D{l}=B.getComputedQualityTimeSeries('time','demandSensingNodes',SensingNodeIndices_NodeBaseDemands);
             i=1;
         end
         
@@ -117,20 +118,22 @@ function [P]=runRandomScenarios(varargin)
             B.setNodeSourceQuality(tmp2)
         end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-        res = B.getComputedTimeSeries;
-        C{k}.QualitySensingNodes = res.NodeQuality(:, SensingNodeIndices_NodeBaseDemands);
-        C{k}.SensingNodesIndices = SensingNodeIndices_NodeBaseDemands;
+        C{k}=B.getComputedQualityTimeSeries('qualitySensingNodes',SensingNodeIndices_NodeBaseDemands);
         d(k)=l;
         t2=toc(t1);
         disp(['[Scenario]: ',num2str(i)])
         st2=st2+t2;
         avtime=st2/i;
         i=i+1;  
-        save([pathname,file0,'.c',num2str(t0)],'C','t0','d','-mat');
-        t0=t0+1;
-        clear C;
-        clear d;
-        k=1;
+        if mod(j,T)==0;
+            save([pathname,file0,'.c',num2str(t0)],'C','t0','d','-mat');
+            t0=t0+1;
+            clear C;
+            clear d;
+            k=1;
+        else
+            k=k+1;
+        end
     end
     try
         save([pathname,file0,'.c',num2str(t0)],'C','t0','d','-mat');
@@ -142,7 +145,7 @@ function [P]=runRandomScenarios(varargin)
     end
     P.newTotalofScenarios=EditNofSce;
     save([pathname,file0,'.0'],'P','B','-mat');
-    save([pathname,file0,'.c0'],'D','l','t0', '-mat');    
+    save([pathname,file0,'.c0'],'D','T','l','t0', '-mat');    
     SimulateMethod='random';
     save([pathname,'Simulate.Method'],'SimulateMethod','-mat');
     disp('Run was succesfull.')
