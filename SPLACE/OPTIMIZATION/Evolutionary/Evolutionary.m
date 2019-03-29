@@ -315,10 +315,15 @@ function Solve_Callback(hObject, eventdata, handles)
             r=Y.F(k,:);k=k+1;
             f1=r(2);
             f2=r(3);
-            if u>1
-                ss1=ss(pp,:);
+            
+            if size(ss, 2)> 1
+                if Y.F(i,1)==1
+                    ss1=ss(Y.F(i,1),pp);
+                else
+                    ss1=ss(pp,:);
+                end
             else
-                ss1=ss(u,pp);
+                ss1=ss(Y.F(i,1), pp);
             end
             Sensors=handles.B.NodeNameID{ss1};
             SensorsSS= [num2str(Sensors),''];
