@@ -868,7 +868,7 @@ function Load_Callback(hObject, eventdata, handles)
     if ~isempty((file0)) 
         load([pathname,file0],'-mat');
 
-        if strcmp(handles.B.inputfile,B.inputfile)
+        if strcmp(handles.B.InputFile,B.InputFile)
             SetGuiParameters(P,B,hObject,handles);
         else
             msgbox('  Scenarios are not on this input file','Error','modal');

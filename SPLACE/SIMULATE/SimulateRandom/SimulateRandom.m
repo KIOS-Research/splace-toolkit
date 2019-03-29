@@ -124,6 +124,7 @@ function start_Callback(hObject, eventdata, handles)
     set(handles.load,'enable','off');
         
     runRandomScenarios(handles);
+    handles.B.loadEPANETFile(handles.B.BinTempfile);clc;
     try
         close(findobj('type','figure','name','Simulate Random Scenarios'))
     catch

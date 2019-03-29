@@ -58,6 +58,8 @@ function [P]=runRandomScenarios(varargin)
         else
             B.setPatternMatrix(P.FlowParamScenarios{6}(:,:,P.ScenariosFlowIndex(i,6))')
         end
+        B.solveCompleteHydraulics;
+        B.saveHydraulicFile([pathname,file0,'.h',num2str(i)])
     end
     
     pstep=P.PatternTimeStep;
