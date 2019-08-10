@@ -162,12 +162,12 @@ function selectAll_Callback(hObject, eventdata, handles)
     check=get(handles.selectAll,'Value');
 
     if check
-        handles.release(1:handles.B.CountNodes)={true};
+        handles.release(1:handles.B.NodeCount)={true};
     else
-        handles.release(1:handles.B.CountNodes)={false};
+        handles.release(1:handles.B.NodeCount)={false};
     end
 
-    for i=1:handles.B.CountNodes
+    for i=1:handles.B.NodeCount
         data{i,1} = handles.B.NodeNameID{i};
         data{i,2}= handles.release{i};
     end
@@ -212,11 +212,11 @@ function NonZero_Callback(hObject, eventdata, handles)
 % Hint: get(hObject,'Value') returns toggle state of NonZero
     set(handles.selectAll,'Value',0);
     
-    bd=find(handles.B.NodeBaseDemands);
+    bd=find(handles.B.NodeBaseDemands{1});
     
     check=get(handles.NonZero,'Value');
     if check
-        for i=1:handles.B.CountNodes
+        for i=1:handles.B.NodeCount
             data{i,1} = handles.B.NodeNameID{i};
             if sum(find(bd==i)) 
                 data{i,2}= true;
@@ -226,7 +226,7 @@ function NonZero_Callback(hObject, eventdata, handles)
         end
         set(handles.uitable1, 'data', data);
     else
-        for i=1:handles.B.CountNodes
+        for i=1:handles.B.NodeCount
             data{i,1} = handles.B.NodeNameID{i};
             data{i,2}= false;
         end

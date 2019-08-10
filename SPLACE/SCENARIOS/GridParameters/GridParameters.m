@@ -73,7 +73,8 @@ function GridParameters_OpeningFcn(hObject, eventdata, handles, varargin)
     % uiwait(handles.figure1);
 
     set(handles.figure1,'name','Create Scenarios (Grid)');
-    set(handles.figure1,'Position',[75 15 164.5 39]);
+    pos = get(handles.figure1, 'Position');
+    set(handles.figure1,'Position',[75 15 pos(3) pos(4)]);
     handles.LoadText=varargin{1}.LoadText;
     handles.B=varargin{1}.B;
     % Update handles structure
@@ -90,8 +91,8 @@ function GridParameters_OpeningFcn(hObject, eventdata, handles, varargin)
     handles.P=P;
 %     handles.B=B;
 
-    handles.release(1:handles.B.CountNodes)=true;
-    handles.sensing(1:handles.B.CountNodes)=true;
+    handles.release(1:handles.B.NodeCount)=true;
+    handles.sensing(1:handles.B.NodeCount)=true;
     %P.SourcesNodeIndicesNonZero=find(P.SourcesNodeIndicesNonZero);
     %handles.sensing(P.NodesNonZeroDemands)=true;
     %P.SourcesNodeIndices=find(handles.release);
@@ -145,30 +146,30 @@ function SetGuiParameters(P,B,hObject,handles)
     set(handles.stop,'String',P.SourcesInjectionTimes(2));
 
     % Hydraulic Parameters
-    LinkTableColumnName = cell(1,B.CountLinks+2);
+    LinkTableColumnName = cell(1,B.LinkCount+2);
     LinkTableColumnName(1,1)={'%'};
     LinkTableColumnName(1,2)={'Samples'};
-    LinkTableColumnName(1,3:B.CountLinks+2)=B.getLinkID;
+    LinkTableColumnName(1,3:B.LinkCount+2)=B.LinkNameID;
     set(handles.LinkTable, 'ColumnName', LinkTableColumnName);
     set(handles.LinkTable,'RowName',{'Diameters','Lengths','Roughness'});
 
     NodeTableColumnName(1,1)={'%'};
     NodeTableColumnName(1,2)={'Samples'};
-    NodeTableColumnName(1,3:B.CountNodes+2)=B.getNodeID;
+    NodeTableColumnName(1,3:B.NodeCount+2)=B.NodeNameID;
     set(handles.NodeTable, 'ColumnName', NodeTableColumnName);
     set(handles.NodeTable,'RowName',{'Elevations','Basedemands'});
 
     % Links
     % Column Edit Table
     ColumnEditable='true ';
-    for i=1:B.CountLinks+2
+    for i=1:B.LinkCount+2
         ColumnEditable = strcat({ColumnEditable},' true');
         ColumnEditable = ColumnEditable{1,1};
     end
     set(handles.LinkTable,'ColumnEditable',str2num(ColumnEditable));
 
     % Diameters
-    LinkTable=zeros(3,B.CountLinks+2);
+    LinkTable=zeros(3,B.LinkCount+2);
     LinkTable(1,1)= P.FlowPrc{1};
     LinkTable(1,2)= P.FlowSamples{1};
     LinkTable(1,3:end)=P.Diameters;
@@ -185,27 +186,31 @@ function SetGuiParameters(P,B,hObject,handles)
     % Nodes
     % Column Edit Table
     ColumnEditable='true ';
-    for i=1:B.CountNodes+2
+    for i=1:B.NodeCount+2
         ColumnEditable = strcat({ColumnEditable},' true');
         ColumnEditable = ColumnEditable{1,1};
     end
     set(handles.NodeTable,'ColumnEditable',str2num(ColumnEditable));
 
     % Elevations
-    NodeTable=zeros(2,B.CountNodes+2);
+    NodeTable=zeros(2,B.NodeCount+2);
     NodeTable(1,1)= P.FlowPrc{4};
     NodeTable(1,2)= P.FlowSamples{4};
     NodeTable(1,3:end)=P.Elevation;
     % Basedemands
     NodeTable(2,1)= P.FlowPrc{5};
     NodeTable(2,2)= P.FlowSamples{5};
-    NodeTable(2,3:end)=P.BaseDemand;
+    if isnumeric(P.BaseDemand)
+        NodeTable(2,3:end)=P.BaseDemand;
+    else
+        NodeTable(2,3:end)=P.BaseDemand{1};
+    end
     set(handles.NodeTable,'data',NodeTable);
 
-    tmpr=false(1,handles.B.CountNodes);
+    tmpr=false(1,handles.B.NodeCount);
     tmpr(find(P.SourcesNodeIndices))=true;
     handles.release=tmpr;
-    tmps=false(1,handles.B.CountNodes);
+    tmps=false(1,handles.B.NodeCount);
     tmps(find(P.SensingNodeIndices))=true;
     handles.sensing=tmps;
 
@@ -1001,8 +1006,8 @@ function releaseLocation_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-    for i=1:handles.B.CountNodes
-        data{i,1} = handles.B.getNodeID{i};
+    for i=1:handles.B.NodeCount
+        data{i,1} = handles.B.getNodeNameID{i};
         data{i,2}= handles.release(i);
     end
 
@@ -1014,7 +1019,7 @@ function releaseLocation_Callback(hObject, eventdata, handles)
 
     SomeDataShared=get(0,'userdata');
 
-    for i=1:handles.B.CountNodes
+    for i=1:handles.B.NodeCount
         handles.release(i)=SomeDataShared{i,2} ;
     end
     guidata(hObject, handles);
@@ -1078,7 +1083,7 @@ function defaultbutton_Callback(hObject, eventdata, handles)
     if button==1
         P=DefaultParameters(handles);
         handles.P=P;
-        handles.release(1:handles.B.CountNodes)=true;
+        handles.release(1:handles.B.NodeCount)=true;
         P.SourcesNodeIndices=handles.release;
         % Update handles structure
         guidata(hObject, handles);
@@ -1139,7 +1144,7 @@ function SensingLocation_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-    for i=1:handles.B.CountNodes
+    for i=1:handles.B.NodeCount
         data{i,1} = handles.B.NodeNameID{i};
         data{i,2}= handles.sensing(i);
     end
@@ -1151,7 +1156,7 @@ function SensingLocation_Callback(hObject, eventdata, handles)
 
     SomeDataShared=get(0,'userdata');
 
-    for i=1:handles.B.CountNodes
+    for i=1:handles.B.NodeCount
         handles.sensing(i)=SomeDataShared{i,2} ;
     end
     guidata(hObject, handles);

@@ -116,20 +116,21 @@ function start_Callback(hObject, eventdata, handles)
     
     set(handles.start,'enable','off');
     set(handles.load,'enable','off');
-    
     runMultipleScenarios(handles)
-    if libisloaded('epanet2')
-        unloadlibrary('epanet2');
+    handles.B.loadEPANETFile(handles.B.BinTempfile);clc;
+    try
+        close(findobj('type','figure','name','Simulate All Scenarios'))
+    catch
     end
-    handles.B=Epanet(handles.B.PathFile,handles.B.InputFile);clc;
-    pause(0.1);
-    close;
 
-    load([pwd,'\RESULTS\','ComWind.messsages'],'msg','-mat');
-    msg=[msg;{'>>Create Hydraulic and Quality files.'}];
-    set(handles.LoadText,'String',msg);
-    set(handles.LoadText,'Value',length(msg)); 
-    save([pwd,'\RESULTS\','ComWind.messsages'],'msg','-mat');
+    try
+        load([pwd,'\RESULTS\','ComWind.messsages'],'msg','-mat');
+        msg=[msg;{'>>Create Hydraulic and Quality files.'}];
+        set(handles.LoadText,'String',msg);
+        set(handles.LoadText,'Value',length(msg)); 
+        save([pwd,'\RESULTS\','ComWind.messsages'],'msg','-mat');
+    catch
+    end
 %     set(handles.runMultipleScenarios,'enable','off');
 
     % --- Executes on button press in load.
@@ -241,3 +242,29 @@ function TotalScenarios_CreateFcn(hObject, eventdata, handles)
 % hObject    handle to TotalScenarios (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
+
+
+
+
+
+
+function edit6_Callback(hObject, eventdata, handles)
+% hObject    handle to SaveEveryScenarios (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of SaveEveryScenarios as text
+%        str2double(get(hObject,'String')) returns contents of SaveEveryScenarios as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function edit6_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to SaveEveryScenarios (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end

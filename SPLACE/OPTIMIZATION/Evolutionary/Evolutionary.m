@@ -71,7 +71,7 @@ function Evolutionary_OpeningFcn(hObject, eventdata, handles, varargin)
 
     % UIWAIT makes Evolutionary wait for user response (see UIRESUME)
     % uiwait(handles.figure1);
-
+    
     set(handles.figure1,'name','Solve Sensor Placement');
     position = get(handles.figure1,'Position');
 %     set(handles.figure1,'Position',[103.8 26 49 31])
@@ -79,7 +79,10 @@ function Evolutionary_OpeningFcn(hObject, eventdata, handles, varargin)
     handles.file0 = varargin{1}.file0;
     handles.B = varargin{1}.B;
     handles.LoadText = varargin{1}.LoadText;
-    handles.SplaceTable = varargin{1}.SplaceTable;    
+    handles.SplaceTable = varargin{1}.SplaceTable; 
+    handles.export_sensors = varargin{1}.export_sensors;
+    handles.axes1 = varargin{1}.axes1;
+
     load([pwd,'\RESULTS\','pathname.File'],'pathname','-mat');
 
     set(handles.LoadImpactMatrix,'enable','off');
@@ -272,7 +275,7 @@ function Solve_Callback(hObject, eventdata, handles)
     set(handles.LoadText,'String',msg);
     set(handles.LoadText,'Value',length(msg)); 
     
-    if sum(str2num(handles.pp.numberOfSensors)>handles.B.CountNodes)>0
+    if sum(str2num(handles.pp.numberOfSensors)>handles.B.NodeCount)>0
         msg=[msg;{'>>Give number of sensors.'}];
         set(handles.LoadText,'String',msg);
         set(handles.LoadText,'Value',length(msg)); 
@@ -299,7 +302,7 @@ function Solve_Callback(hObject, eventdata, handles)
     set(handles.SplaceTable,'Foregroundcolor','b');  
     set(handles.SplaceTable,'fontsize',8);%10
     
-    w=[{'------S-PLACE------'};{' '}];
+    w=[{'------S-PLACE------ [Evolutionary Method]'};{' '}];
     set(handles.SplaceTable,'visible','on');
     a=str2num(handles.pp.numberOfSensors);
     u=1;
@@ -312,10 +315,15 @@ function Solve_Callback(hObject, eventdata, handles)
             r=Y.F(k,:);k=k+1;
             f1=r(2);
             f2=r(3);
-            if size(ss)>1
-                ss1=ss(pp,:);
+            
+            if size(ss, 2)> 1
+                if Y.F(i,1)==1
+                    ss1=ss(Y.F(i,1),pp);
+                else
+                    ss1=ss(pp,:);
+                end
             else
-                ss1=ss(:,pp);
+                ss1=ss(Y.F(i,1), pp);
             end
             Sensors=handles.B.NodeNameID{ss1};
             SensorsSS= [num2str(Sensors),''];
@@ -324,9 +332,10 @@ function Solve_Callback(hObject, eventdata, handles)
                     SensorsSS = [SensorsSS,'  ',num2str(handles.B.NodeNameID{ss1(t)})];
                 end
             end
-            w=[w;{['mean=',num2str(sprintf('%10.2f',f1)),'       max=',num2str(sprintf('%10.2f',f2)),'       NodesID: ',SensorsSS]}];
+            w=[w;{['mean = ',num2str(sprintf('%10.2f',f1)),'       max = ',num2str(sprintf('%10.2f',f2)),'       NodesID: ',SensorsSS]}];
+            warning off;
             set(handles.SplaceTable,'Value',length(w));
-            set(handles.SplaceTable,'String',w);
+            set(handles.SplaceTable,'String',w);warning on;
         else
             u=u+1;
             pp=0;
@@ -336,13 +345,14 @@ function Solve_Callback(hObject, eventdata, handles)
         i=i+1;pp=pp+1;
     end
     
-    msg=[msg;{'>>Sensor solutions.'}];
+    set(handles.export_sensors,'visible','on');
+    msg=[msg;{'>>Evolutionary algorithm was succesfull.'}];
     set(handles.LoadText,'String',msg);
     set(handles.LoadText,'Value',length(msg)); 
+    save([pwd,'\RESULTS\','w.report'],'w','-mat');
     save([pwd,'\RESULTS\','ComWind.messsages'],'msg','-mat');
     
-    
-    
+   
 function [errorCode,pp] = CheckForError(hObject,handles)
     errorCode=0;
     pp.PopulationSize_Data=str2num(get(handles.PopulationSize_Data, 'String'));
@@ -368,7 +378,7 @@ function [errorCode,pp] = CheckForError(hObject,handles)
         return
     end
 
-    if ~length(pp.numberOfSensors) || sum(pp.numberOfSensors<0) || sum((pp.numberOfSensors)>handles.B.CountNodes)>0   
+    if ~length(pp.numberOfSensors) || sum(pp.numberOfSensors<0) || sum((pp.numberOfSensors)>handles.B.NodeCount)>0   
     msgbox('     Give Number of Sensors', 'Error', 'modal')
     errorCode=1;
     return
@@ -439,7 +449,7 @@ function LoadScenarios_Callback(hObject, eventdata, handles)
         file0=[];
     end
     if ~isempty((file0)) 
-        load([pathname,file0,'.0'],'-mat');clc;
+        load([pathname,file0,'.0'],'-mat');%clc;
         handles.file0=file0;
         if ~strcmp(handles.B.InputFile,B.InputFile)
             set(handles.Solve,'enable','off');

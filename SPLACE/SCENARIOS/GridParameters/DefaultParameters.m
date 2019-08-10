@@ -24,7 +24,7 @@ function P=DefaultParameters(varargin)
     P.MethodParameter=NaN;
 
     %TIMES
-    P.PatternTimeStep=B.getTimePatternStep;
+    P.PatternTimeStep=B.TimePatternStep;
     P.SimulationTime=48; %e.g.48 in Hours
 
 
@@ -40,20 +40,20 @@ function P=DefaultParameters(varargin)
     P.SourcesMaxNumber=1; % maximum number of simultaneous sources (including 1,2..)
     P.SourcesInjectionTimes=[0 24]; %from...to in hours
     %P.SourcesInjectionTimes=[4 5]; %from...to in hours
-    P.SourcesNodeIndices=1:B.CountNodes;
-    P.SensingNodeIndices=1:B.CountNodes;
+    P.SourcesNodeIndices=1:B.NodeCount;
+    P.SensingNodeIndices=1:B.NodeCount;
     %P.SourcesNodeIndices=[3 10];
     %P.SourcesNodeIndices=89;
 
     %AFFECTING FLOWS
-    P.Diameters=B.getLinkDiameter;
-    P.Lengths=B.getLinkLength;
-    P.Roughness=B.getLinkRoughness;
-    P.Elevation=B.getNodeElevation;
-    P.BaseDemand=B.getNodeBaseDemand;
+    P.Diameters=B.LinkDiameter;
+    P.Lengths=B.LinkLength;
+    P.Roughness=B.LinkRoughnessCoeff;
+    P.Elevation=B.NodeElevations;
+    P.BaseDemand=B.NodeBaseDemands{1};
     %P.SourcesNodeIndicesNonZero=P.BaseDemand~=0;
     P.NodesNonZeroDemands=find(P.BaseDemand>0);
-    P.Patterns=B.getPattern;
+    P.Patterns=B.Pattern;
 
     P.FlowParameters={'Diameters', 'Lengths','Roughness',...
         'Elevation','BaseDemand','Patterns'};

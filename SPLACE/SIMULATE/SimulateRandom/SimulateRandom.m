@@ -122,22 +122,23 @@ function start_Callback(hObject, eventdata, handles)
     
     set(handles.start,'enable','off');
     set(handles.load,'enable','off');
-    
-    runRandomScenarios(handles)
-    if libisloaded('epanet2')
-        unloadlibrary('epanet2');
-    end
-    handles.B=Epanet(handles.B.PathFile,handles.B.InputFile);clc;
-    pause(0.1);
-    close;
-
-    load([pwd,'\RESULTS\','ComWind.messsages'],'msg','-mat');
-    msg=[msg;{'>>Create Hydraulic and Quality files.'}];
-    set(handles.LoadText,'String',msg);
-    set(handles.LoadText,'Value',length(msg)); 
-    save([pwd,'\RESULTS\','ComWind.messsages'],'msg','-mat');
-%     set(handles.runMultipleScenarios,'enable','off');
         
+    runRandomScenarios(handles);
+    handles.B.loadEPANETFile(handles.B.BinTempfile);clc;
+    try
+        close(findobj('type','figure','name','Simulate Random Scenarios'))
+    catch
+    end
+    
+    try
+        load([pwd,'\RESULTS\','ComWind.messsages'],'msg','-mat');
+        msg=[msg;{'>>Create Hydraulic and Quality files.'}];
+        set(handles.LoadText,'String',msg);
+        set(handles.LoadText,'Value',length(msg)); 
+        save([pwd,'\RESULTS\','ComWind.messsages'],'msg','-mat');
+    catch
+    end
+    
 % --- Executes on button press in load.
 function load_Callback(hObject, eventdata, handles)
 % hObject    handle to load (see GCBO)
@@ -246,3 +247,6 @@ function TotalScenarios_CreateFcn(hObject, eventdata, handles)
 % hObject    handle to TotalScenarios (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
+
+
+

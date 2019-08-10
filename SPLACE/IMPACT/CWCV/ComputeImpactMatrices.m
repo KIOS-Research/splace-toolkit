@@ -19,7 +19,9 @@ function ComputeImpactMatrices(varargin)
         IM{1}.SensorThreshold=varargin{1}.SensorThreshold1;
         load([pwd,'\RESULTS\','pathname.File'],'pathname','-mat');
     else
-        file0=varargin{1};
+%         B=varargin{1}; 
+%         P=varargin{2}; 
+        file0=varargin{1}; 
         %contaminanted water consumption volume
         IM{1}.SensorThreshold=0.3; %mg/L 
         pathname=[pwd,'\RESULTS\'];
@@ -29,65 +31,72 @@ function ComputeImpactMatrices(varargin)
     load([pathname,file0,'.c0'],'-mat')
     load([pathname,'Simulate.Method'],'SimulateMethod','-mat');
 
-    sizeflowscenarios=size(P.ScenariosFlowIndex,1);
-    sizecontscenarios=size(P.ScenariosContamIndex,1);
+    sizeflowscenarios = size(P.ScenariosFlowIndex,1);
+    sizecontscenarios = size(P.ScenariosContamIndex,1);
     
     if strcmpi(SimulateMethod,'grid')
-        totalscenarios=sizeflowscenarios*sizecontscenarios;
+        totalscenarios = sizeflowscenarios*sizecontscenarios;
     elseif strcmpi(SimulateMethod,'random')
-        totalscenarios=P.newTotalofScenarios;
+        totalscenarios = P.newTotalofScenarios;
     end
     disp('Compute Impact Matrix')
-    Dt=double(B.TimeHydraulicStep)/60; % time step in minutes
-    T=inf*ones(sizeflowscenarios*sizecontscenarios,B.CountNodes);
-    W{1}=inf*ones(totalscenarios,B.CountNodes);
-    %W{2}=inf*ones(sizeflowscenarios*sizecontscenarios,B.CountNodes);
+    Dt = double(B.TimeHydraulicStep)/60; % time step in minutes
+    T = inf*ones(sizeflowscenarios*sizecontscenarios, B.NodeCount);
+    W{1} = inf*ones(totalscenarios, B.NodeCount);
+    %W{2}=inf*ones(sizeflowscenarios*sizecontscenarios,B.NodeCount);
     for i=1:length(D)
-        demand{i}=zeros(size(D{1}.Demand,1),size(D{1}.Demand,2));
-        demand{i}(:,B.NodeJunctionIndex)=D{i}.Demand(:,B.NodeJunctionIndex);
-        demand{i}(find(demand{i}<0))=0;
+        demand{i} = zeros(size(D{1}.DemandSensingNodes,1), B.NodeCount);
+        find_sens_ind = find(P.SensingNodeIndices);
+        [~,b] = intersect(D{i}.SensingNodesIndices, find_sens_ind);
+        demand{i}(:, find_sens_ind) = D{i}.DemandSensingNodes(:,b);
+        demand{i}(find(demand{i}<0)) = 0;
+    end
+    if isstruct(varargin{1}) 
+        progressbar('Compute Impact Matrix...')
     end
     
     l=0;pp=1;
     for i=1:t0
-        if exist([pathname,file0,'.c',num2str(i)])==2
+        if exist([pathname, file0, '.c',num2str(i)])==2
             try
-                load([pathname,file0,'.c',num2str(i)],'-mat')
-            catch err
+                load([pathname, file0, '.c',num2str(i)], '-mat')
+            catch 
                 break
             end
             
-            for k=1:size(C,2)
-                c=C{k}.Quality;             
+            for k=1:size(C, 2)
+                c=C{k}.QualitySensingNodes(:,b);   
+                c1=zeros(size(C{k}.QualitySensingNodes,1),B.NodeCount);
                 l=l+1;
                 %Contaminated Water Consumption Volume
-                c1=c;
+                c1(:,find(P.SensingNodeIndices))=c;
                 c1(find(c1<=IM{1}.SensorThreshold))=0;
                 c1(find(c1>IM{1}.SensorThreshold))=1;
                 detectionNodes=find(sum(c1));
-                cwv=c1.*Dt.*demand{d(k)}; %D{d(k)}.Demand.*Dt;
+                cwv = c1.*Dt.*demand{d(k)}; %D{d(k)}.Demand.*Dt;
                 for j=detectionNodes
-                    [a tmp]=max(c1(:,j));
-                    W{1}(l,j)=sum(sum(cwv(1:tmp,1:B.CountNodes)));
+                    [~, tmp] = max(c1(:,j));
+                    W{1}(l,j) = sum(sum(cwv(1:tmp,1:B.NodeJunctionCount)));%B.NodeCount
                 end
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
                 if isstruct(varargin{1}) 
-                    if mod(pp,100)==1
-                        nload=pp/(totalscenarios); 
-                        varargin{1}.color=char('red');
-                        progressbar(varargin{1},nload)
-                    end
+                    nload=pp/(totalscenarios); 
+                    progressbar(nload)
                     pp=pp+1;
                 end 
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%  
                 try
-                    W{1}(l,find(W{1}(l,:)==inf))=sum(sum(cwv(1:size(cwv,1),1:B.CountNodes))); 
-                catch err
+                    W{1}(l,find(W{1}(l,:) == inf)) = sum(sum(cwv(1:size(cwv,1),1:B.NodeJunctionCount))); 
+                catch
                 end
             end
             clear C;
-            W{1}(:,find(P.SensingNodeIndices==0))=0;
+            W{1}(:,P.SensingNodeIndices==0) = 0;
             save([pathname,file0,'.w'],'W', 'IM', '-mat');
         end
     end
+    if isstruct(varargin{1}) 
+        progressbar(1);
+    end
+    disp('Run was succesfull.')
 end

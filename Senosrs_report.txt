@@ -1,0 +1,13 @@
+------S-PLACE------ [Exhaustive Method]
+ 
+------Sensors-Placement: 1
+mean =   42540.42       max =  218610.01       NodesID: 12
+------Sensors-Placement: 2
+mean =   23495.04       max =  153720.00       NodesID: 11  22
+mean =   25398.25       max =   60480.00       NodesID: 21  22
+------Sensors-Placement: 3
+mean =   17926.36       max =   60480.00       NodesID: 11  22  31
+
+----------------------------------------------------
+
+Report by S-PLACE Toolkit.

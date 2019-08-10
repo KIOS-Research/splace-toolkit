@@ -157,12 +157,12 @@ function selectAll_Callback(hObject, eventdata, handles)
     check=get(handles.selectAll,'Value');
 
     if check
-        handles.release(1:handles.B.CountNodes)={true};
+        handles.release(1:handles.B.NodeCount)={true};
     else
-        handles.release(1:handles.B.CountNodes)={false};
+        handles.release(1:handles.B.NodeCount)={false};
     end
 
-    for i=1:handles.B.CountNodes
+    for i=1:handles.B.NodeCount
         data{i,1} = handles.B.NodeNameID{i};
         data{i,2}= handles.release{i};
     end

@@ -110,17 +110,20 @@ function start_Callback(hObject, eventdata, handles)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     % Method
     ComputeImpactMatrices(handles)
+    try
+        close(findobj('type','figure','name','Compute Impact Matrix (CWCV)'))
+    catch
+    end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-    load([pwd,'\RESULTS\','ComWind.messsages'],'msg','-mat');
-    set(handles.LoadText,'Value',1);
-    msg=[msg;{['>>Computed Impact Matrix in file "',handles.file0,'.w','"']}];
-    set(handles.LoadText,'String',msg);
-    set(handles.LoadText,'Value',length(msg)); 
-    save([pwd,'\RESULTS\','ComWind.messsages'],'msg','-mat');
-    
-    pause(0.1);
-    close;
+    try
+        load([pwd,'\RESULTS\','ComWind.messsages'],'msg','-mat');
+        set(handles.LoadText,'Value',1);
+        msg=[msg;{['>>Computed Impact Matrix in file "',handles.file0,'.w','"']}];
+        set(handles.LoadText,'String',msg);
+        set(handles.LoadText,'Value',length(msg)); 
+        save([pwd,'\RESULTS\','ComWind.messsages'],'msg','-mat');
+    catch
+    end
     
 % --- Executes on button press in load.
 function load_Callback(hObject, eventdata, handles)

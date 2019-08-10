@@ -20,7 +20,7 @@ function ExhaustiveOptimization(varargin)
         load([pwd,'\RESULTS\','pathname.File'],'pathname','-mat');
     else
         file0=varargin{1};
-        numberOfSensors=1:5;
+        numberOfSensors=varargin{2};%         numberOfSensors=1:5;
         pathname=[pwd,'\RESULTS\'];
     end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -36,26 +36,23 @@ function ExhaustiveOptimization(varargin)
     Y.F=[];
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     if isstruct(varargin{1}) 
-        [v.figure1,v.axes2,v.text_progress]=SolveLoadGui;
-        v.str='Solve with exhaustive method..';
+        progressbar('Solve with exhaustive method..')
+        
         for j=numberOfSensors
-            total(j) = nchoosek(length(1:B.CountNodes),j);
+            total(j) = nchoosek(length(1:B.NodeCount),j);
         end
         total=sum(total);pp=1;
     end
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     for j=numberOfSensors
-        numberCombinations=nchoosek(length(1:B.CountNodes),j);
+        numberCombinations=nchoosek(length(1:B.NodeCount),j);
         population=combnk(find(P.SensingNodeIndices),j);
         score=inf*ones(size(population,1),2); 
         for i=1:size(population,1)
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             if isstruct(varargin{1}) 
-                if mod(pp,100)==1
-                    nload=pp/total;
-                    v.color=char('red');
-                    progressbar(v,nload);
-                end
+                nload=pp/total;
+                progressbar(nload);
                 pp=pp+1;
             end
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -63,19 +60,6 @@ function ExhaustiveOptimization(varargin)
         end
         PS{j}=paretofront(score);
 
-        %mean2=0;
-        %max2=0;
-        %numberCombinations = nchoosek(length(1:B.CountNodes),j);
-        %X=combnk(1:B.CountNodes,j);
-        %tic
-        %for i=1:size(X,1)
-            % THIS TAKES SOME TIME TO CALCULATE for each scenario
-       %     mean2(i)=mean(min(W{1}(:,X(i,:)),[],2));
-       %     max2(i)=max(min(W{1}(:,X(i,:)),[],2));
-       % end
-       % y=[mean2; max2]';
-       % PS{j}=paretofront(y);
-       % toc;
         %because the pareto front does not return solutions with
         %the same values
         tmp=find(PS{j}==1);
@@ -89,7 +73,7 @@ function ExhaustiveOptimization(varargin)
         sols=find(PS{j}==1);
         Y.xIndex{k}=population(sols,:);
         for i=1:size(Y.xIndex{k},1)
-            x=logical(zeros(1,B.CountNodes));
+            x=logical(zeros(1,B.NodeCount));
             x(Y.xIndex{k}(i,:))=1;
             Y.x=[Y.x; x];
         end
@@ -99,10 +83,10 @@ function ExhaustiveOptimization(varargin)
     end
     save([pathname,file0,'.y0'],'Y', '-mat');
 
-    %%%%%%%%%%%%%%%%
     if isstruct(varargin{1}) 
-        close(v.figure1);
+        progressbar(1);
     end
+    disp('Run was succesfull.')
     %%%%%%%%%%%%%%%%
 end
 
