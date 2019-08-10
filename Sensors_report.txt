@@ -10,4 +10,6 @@ mean =   17926.36       max =   60480.00       NodesID: 11  22  31
 
 ----------------------------------------------------
 
+Network file: "Net1_Rossman2000.inp"
+
 Report by S-PLACE Toolkit.
