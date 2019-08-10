@@ -1221,10 +1221,14 @@ function export_sensors_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 load([pwd,'\RESULTS\','w.report'],'w','-mat');
 
-f = fopen('Senosrs_report.txt', 'w');
+% [~, repname] = fileparts(handles.B.InputFile);
+% name = [repname, 'Sensors_report.txt'];
+name = 'Sensors_report.txt';
+f = fopen(name, 'w');
+
 for i=1:length(w)
-fprintf(f, w{i});
-fprintf(f, '\n');
+    fprintf(f, w{i});
+    fprintf(f, '\n');
 end
 fprintf(f, '\n');
 
@@ -1235,4 +1239,4 @@ fprintf(f, '\n');
 fprintf(f, 'Report by S-PLACE Toolkit.');
 
 fclose(f);
-winopen('Senosrs_report.txt');
+winopen(name);
