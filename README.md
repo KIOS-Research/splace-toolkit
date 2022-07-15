@@ -1,4 +1,4 @@
-<a href="http://www.kios.ucy.ac.cy"><img src="http://www.kios.ucy.ac.cy/templates/favourite/images/kios_logo_hover.png"/><a>
+<a href="http://www.kios.ucy.ac.cy"><img src="https://www.kios.ucy.ac.cy/wp-content/uploads/2021/07/Logotype-KIOS.svg" width="200" height="100"/><a>
 
 [![DOI](https://zenodo.org/badge/DOI/10.1016/j.proeng.2014.02.066.svg)](https://doi.org/10.1016/j.proeng.2014.02.066)
 
