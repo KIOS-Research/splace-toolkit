@@ -2,6 +2,7 @@
 
 [![DOI](https://zenodo.org/badge/DOI/10.1016/j.proeng.2014.02.066.svg)](https://doi.org/10.1016/j.proeng.2014.02.066)
 
+[![View splace-toolkit on File Exchange](https://www.mathworks.com/matlabcentral/images/matlab-file-exchange.svg)](https://www.mathworks.com/matlabcentral/fileexchange/129839-splace-toolkit)
 
 Sensor Placement (S-PLACE) Toolkit
 ==============
